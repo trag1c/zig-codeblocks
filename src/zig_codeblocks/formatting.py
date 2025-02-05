@@ -119,6 +119,10 @@ def _adjust_string_idents(body: Body, token: Token) -> None:
 
 
 def _process_zig_tokens(source: str, tokens: Iterator[Token]) -> str:
+    body: Body = []
+    pointer = 0
+    token = next(tokens)
+
     def skip_to_token() -> None:
         nonlocal pointer
         filler = source[pointer : token.byte_range.start]
@@ -126,10 +130,6 @@ def _process_zig_tokens(source: str, tokens: Iterator[Token]) -> str:
             _adjust_reset(body)
         body.append(filler)
         pointer = token.byte_range.start
-
-    body: Body = []
-    pointer = 0
-    token = next(tokens)
 
     while pointer < len(source):
         if token.byte_range.start > pointer:
