@@ -8,7 +8,7 @@ on:
 
 env:
   PY_COLORS: 1
-  UV_VERSION: 0.5.27
+  UV_VERSION: 0.5.28
 
 jobs:
   ci:
@@ -23,8 +23,6 @@ jobs:
         - python: "3.11"
           platform: "ubuntu"
         - python: "3.12"
-          platform: "ubuntu"
-        - python: "pypy3.10"
           platform: "ubuntu"
     steps:
     - uses: actions/checkout@v4

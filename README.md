@@ -3,9 +3,9 @@
 
 # zig-codeblocks
 
-`zig-codeblocks` is a Python 3.10+ library for adding syntax highlighting to Zig
-code blocks in Markdown files through ANSI escape codes. Originally intended for
-patching the lack of syntax highlighting for Zig on Discord.
+`zig-codeblocks` is a CPython 3.10+ library for adding syntax highlighting to
+Zig code blocks in Markdown files through ANSI escape codes. Originally intended
+for patching the lack of syntax highlighting for Zig on Discord.
 
 
 ## Installation
