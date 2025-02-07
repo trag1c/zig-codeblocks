@@ -1,10 +1,14 @@
+import re
 from collections.abc import Iterator
 from itertools import chain
-from typing import NamedTuple, cast
+from typing import NamedTuple
 
-import marko
 import tree_sitter as ts
 import tree_sitter_zig
+
+CODE_BLOCK_PATTERN = re.compile(r"```(?:(\w+)\n)?(.*?)```", re.DOTALL)
+
+ZIG_PARSER = ts.Parser(ts.Language(tree_sitter_zig.language()))
 
 
 class Token(NamedTuple):
@@ -13,23 +17,16 @@ class Token(NamedTuple):
     byte_range: range
 
 
-ZIG_PARSER = ts.Parser(ts.Language(tree_sitter_zig.language()))
-
-
 class CodeBlock(NamedTuple):
     """A code block extracted from a Markdown source."""
 
-    lang: str
+    lang: str | None
     body: str
 
 
 def extract_codeblocks(source: str) -> Iterator[CodeBlock]:
     """Yield CodeBlocks from a Markdown source."""
-    for element in marko.parse(source).children:
-        if not isinstance(element, marko.block.FencedCode):
-            continue
-        body = cast(marko.parser.inline.RawText, element.children[0])  # type: ignore[name-defined]
-        yield CodeBlock(element.lang, body.children)
+    return (CodeBlock(*m.groups()) for m in CODE_BLOCK_PATTERN.finditer(source))
 
 
 def tokenize_zig(source: str) -> Iterator[Token]:
