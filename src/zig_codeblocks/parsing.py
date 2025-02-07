@@ -6,7 +6,9 @@ from typing import NamedTuple
 import tree_sitter as ts
 import tree_sitter_zig
 
-CODE_BLOCK_PATTERN = re.compile(r"```(?:(\w+)\n)?(.*?)```", re.DOTALL)
+CODE_BLOCK_PATTERN = re.compile(
+    r"```(?:([A-Za-z0-9\-_\+\.#]+)\n+([^\n].+?)|(.*?))```", re.DOTALL
+)
 
 ZIG_PARSER = ts.Parser(ts.Language(tree_sitter_zig.language()))
 
@@ -26,7 +28,13 @@ class CodeBlock(NamedTuple):
 
 def extract_codeblocks(source: str) -> Iterator[CodeBlock]:
     """Yield CodeBlocks from a Markdown source."""
-    return (CodeBlock(*m.groups()) for m in CODE_BLOCK_PATTERN.finditer(source))
+    for m in CODE_BLOCK_PATTERN.finditer(source):
+        lang, body, no_lang_body = m.groups()
+        yield (
+            CodeBlock(lang, body=body.strip("\n"))
+            if lang
+            else CodeBlock(lang=None, body=no_lang_body.strip("\n"))
+        )
 
 
 def tokenize_zig(source: str) -> Iterator[Token]:
