@@ -7,7 +7,7 @@ import tree_sitter as ts
 import tree_sitter_zig
 
 CODE_BLOCK_PATTERN = re.compile(
-    r"```(?:([A-Za-z0-9\-_\+\.#]+)\n+([^\n].+?)|(.*?))```", re.DOTALL
+    r"```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].+?)|(.*?))```", re.DOTALL
 )
 
 ZIG_PARSER = ts.Parser(ts.Language(tree_sitter_zig.language()))
@@ -33,9 +33,9 @@ def extract_codeblocks(source: str | bytes) -> Iterator[CodeBlock]:
     for m in CODE_BLOCK_PATTERN.finditer(source):
         lang, body, no_lang_body = m.groups()
         yield (
-            CodeBlock(lang, body=body.strip("\n"))
+            CodeBlock(lang, body=body.strip("\r\n"))
             if lang
-            else CodeBlock(lang=None, body=no_lang_body.strip("\n"))
+            else CodeBlock(lang=None, body=no_lang_body.strip("\r\n"))
         )
 
 
