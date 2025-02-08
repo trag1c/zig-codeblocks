@@ -69,7 +69,9 @@ ZIG_KEYWORDS = frozenset(
 )
 ZIG_TYPE_TOKENS = frozenset({"builtin_type", "f64"})
 ZIG_NUMERIC_TOKENS = frozenset({"integer", "float"})
-ZIG_STRING_TOKENS = frozenset({"string_content", "multiline_string", '"'})
+ZIG_STRING_TOKENS = frozenset(
+    {"string_content", "multiline_string", '"', "'", "character_content"}
+)
 
 _KIND_MAPPINGS = {
     "comment": Style(Color.GRAY),
