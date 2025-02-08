@@ -118,7 +118,7 @@ def _adjust_string_idents(body: Body, token: Token) -> None:
         del body[-3]
 
 
-def _process_zig_tokens(source: str, tokens: Iterator[Token]) -> str:
+def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
     body: Body = []
     pointer = 0
     token = next(tokens)
@@ -128,7 +128,7 @@ def _process_zig_tokens(source: str, tokens: Iterator[Token]) -> str:
         filler = source[pointer : token.byte_range.start]
         if not filler.isspace():
             _adjust_reset(body)
-        body.append(filler)
+        body.append(filler.decode())
         pointer = token.byte_range.start
 
     while pointer < len(source):
@@ -166,7 +166,7 @@ def _process_zig_tokens(source: str, tokens: Iterator[Token]) -> str:
 
 def highlight_zig_code(source: str) -> str:
     """Return an ANSI syntax-highlighted version of the given Zig source code."""
-    return _process_zig_tokens(source, tokenize_zig(source))
+    return _process_zig_tokens(source.encode(), tokenize_zig(source))
 
 
 def process_markdown(source: str, *, only_code: bool = False) -> str:
