@@ -18,11 +18,12 @@ SOURCE_DIR = Path(__file__).parent / "sources"
     ],
 )
 def test_codeblock_spacing_scenarios(file_name: str) -> None:
-    src = (SOURCE_DIR / "spacing" / file_name).read_text()
-    assert list(extract_codeblocks(src)) == [
-        CodeBlock(lang="py", body="print(1)"),
-        CodeBlock(lang="zig", body='const std = @import("std");'),
-    ]
+    src = SOURCE_DIR / "spacing" / file_name
+    for meth in (Path.read_text, Path.read_bytes):
+        assert list(extract_codeblocks(meth(src))) == [
+            CodeBlock(lang="py", body="print(1)"),
+            CodeBlock(lang="zig", body='const std = @import("std");'),
+        ]
 
 
 @pytest.mark.parametrize(
@@ -38,7 +39,6 @@ def test_codeblock_spacing_scenarios(file_name: str) -> None:
     ],
 )
 def test_codeblock_with_language(source: str, expected: tuple[str | None, str]) -> None:
-    print((source, expected))
     codeblocks = list(extract_codeblocks(f"```{source}```"))
     assert len(codeblocks) == 1
     assert codeblocks[0] == CodeBlock(*expected)

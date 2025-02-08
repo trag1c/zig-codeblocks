@@ -166,16 +166,24 @@ def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
     return "".join(map(str, body))
 
 
-def highlight_zig_code(source: str) -> str:
-    """Return an ANSI syntax-highlighted version of the given Zig source code."""
-    return _process_zig_tokens(source.encode(), tokenize_zig(source))
+def highlight_zig_code(source: str | bytes) -> str:
+    """
+    Return an ANSI syntax-highlighted version of the given Zig source code.
+    Assumes UTF-8 if source is `bytes`.
+    """
+    if isinstance(source, str):
+        source = source.encode()
+    return _process_zig_tokens(source, tokenize_zig(source))
 
 
-def process_markdown(source: str, *, only_code: bool = False) -> str:
+def process_markdown(source: str | bytes, *, only_code: bool = False) -> str:
     """
     Return a Markdown source with Zig code blocks syntax-highlighted.
     If `only_code` is True, only processed Zig code blocks will be returned.
+    Assumes UTF-8 if source is `bytes`.
     """
+    if isinstance(source, bytes):
+        source = source.decode()
     zig_codeblocks = (
         block.body for block in extract_codeblocks(source) if block.lang == "zig"
     )

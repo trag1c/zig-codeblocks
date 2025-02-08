@@ -26,8 +26,10 @@ class CodeBlock(NamedTuple):
     body: str
 
 
-def extract_codeblocks(source: str) -> Iterator[CodeBlock]:
-    """Yield CodeBlocks from a Markdown source."""
+def extract_codeblocks(source: str | bytes) -> Iterator[CodeBlock]:
+    """Yield CodeBlocks from a Markdown source. Assumes UTF-8 if source is `bytes`."""
+    if isinstance(source, bytes):
+        source = source.decode()
     for m in CODE_BLOCK_PATTERN.finditer(source):
         lang, body, no_lang_body = m.groups()
         yield (
@@ -37,8 +39,7 @@ def extract_codeblocks(source: str) -> Iterator[CodeBlock]:
         )
 
 
-def tokenize_zig(source: str) -> Iterator[Token]:
-    src = source.encode()
+def tokenize_zig(src: bytes) -> Iterator[Token]:
     tree = ZIG_PARSER.parse(src)
     return _traverse(tree.root_node, src)
 
