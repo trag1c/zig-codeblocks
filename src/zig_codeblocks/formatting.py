@@ -100,14 +100,6 @@ def _last_applied_style(body: Body) -> Style | Reset | None:
     return next((item for item in body[::-1] if not isinstance(item, str)), None)
 
 
-def _adjust_reset(body: Body) -> None:
-    last_style = _last_applied_style(body)
-    if last_style is Reset.BOLD:
-        body[~body[::-1].index(Reset.BOLD)] = Reset.FULL
-    elif last_style is not Reset.FULL:
-        body.append(Reset.FULL)
-
-
 def _adjust_string_idents(body: Body, token: Token) -> None:
     # Special case for `whatever.@"something here"`,
     # which is an identifier, so should have no string highlighting
@@ -128,8 +120,9 @@ def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
     def skip_to_token() -> None:
         nonlocal pointer
         filler = source[pointer : token.byte_range.start]
-        if not filler.isspace():
-            _adjust_reset(body)
+        match filler.isspace(), _last_applied_style(body):
+            case (False, _) | (True, Style(underline=True) | Style(bold=True)):
+                body.append(Reset.FULL)
         body.append(filler.decode())
         pointer = token.byte_range.start
 
@@ -144,19 +137,14 @@ def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
             else _get_style(token.kind)
         )
         if style is None:
-            _adjust_reset(body)
+            if _last_applied_style(body) is not Reset.FULL:
+                body.append(Reset.FULL)
         elif _last_applied_style(body) is not style:
             body.append(style)
 
         _adjust_string_idents(body, token)
 
         body.append(token.value.decode())
-
-        match style:
-            case Style(bold=True):
-                body.append(Reset.BOLD)
-            case Style(underline=True):
-                body.append(Reset.UNDERLINE)
 
         pointer = token.byte_range.stop
         try:
