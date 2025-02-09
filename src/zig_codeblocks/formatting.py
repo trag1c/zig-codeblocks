@@ -3,8 +3,9 @@ from __future__ import annotations
 from itertools import tee
 from typing import TYPE_CHECKING, TypeVar
 
+from zig_codeblocks import consts
 from zig_codeblocks.parsing import extract_codeblocks, tokenize_zig
-from zig_codeblocks.styling import Color, Reset, Style
+from zig_codeblocks.styling import Reset, Style, Theme
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -14,82 +15,23 @@ if TYPE_CHECKING:
 Body = list[str | Style | Reset]
 T = TypeVar("T")
 
-ZIG_KEYWORDS = frozenset(
-    {
-        "addrspace",
-        "align",
-        "allowzero",
-        "and",
-        "anyframe",
-        "anytype",
-        "asm",
-        "async",
-        "await",
-        "break",
-        "callconv",
-        "catch",
-        "comptime",
-        "const",
-        "continue",
-        "defer",
-        "else",
-        "enum",
-        "errdefer",
-        "error",
-        "export",
-        "extern",
-        "fn",
-        "for",
-        "if",
-        "inline",
-        "linksection",
-        "noalias",
-        "noinline",
-        "nosuspend",
-        "opaque",
-        "or",
-        "orelse",
-        "packed",
-        "pub",
-        "resume",
-        "return",
-        "struct",
-        "suspend",
-        "switch",
-        "test",
-        "threadlocal",
-        "try",
-        "union",
-        "unreachable",
-        "usingnamespace",
-        "var",
-        "volatile",
-        "while",
-    }
-)
-ZIG_TYPE_TOKENS = frozenset({"builtin_type", "f64"})
-ZIG_NUMERIC_TOKENS = frozenset({"integer", "float"})
-ZIG_STRING_TOKENS = frozenset(
-    {"string_content", "multiline_string", '"', "'", "character_content"}
-)
 
-_KIND_MAPPINGS = {
-    "comment": Style(Color.GRAY),
-    "builtin_identifier": Style(Color.BLUE, bold=True),
-}
-_GROUP_KIND_MAPPINGS: tuple[tuple[frozenset[str], Style], ...] = (
-    (ZIG_STRING_TOKENS, Style(Color.GREEN)),
-    (ZIG_KEYWORDS, Style(Color.ORANGE)),
-    (ZIG_NUMERIC_TOKENS, Style(Color.CYAN)),
-    (ZIG_TYPE_TOKENS, Style(Color.MAGENTA)),
-)
-
-
-def _get_style(kind: str) -> Style | None:
-    return next(
-        (style for options, style in _GROUP_KIND_MAPPINGS if kind in options),
-        None,
-    ) or _KIND_MAPPINGS.get(kind)
+def _get_style(kind: str, theme: Theme) -> Style | None:
+    for options, style in (
+        (consts.IDENTIFIERS, theme.identifiers),
+        (consts.KEYWORDS, theme.keywords),
+        (consts.NUMERIC_LITERALS, theme.numeric),
+        (consts.PRIMITIVE_VALUES, theme.primitive_values),
+        (consts.STRINGLIKE, theme.strings),
+        (consts.TYPES, theme.types),
+    ):
+        if kind in options:
+            return style
+    if kind == "comment":
+        return theme.comments
+    if kind == "builtin_identifier":
+        return theme.builtin_identifiers
+    return None
 
 
 def _peek(iterator: Iterator[T]) -> T:
@@ -100,19 +42,24 @@ def _last_applied_style(body: Body) -> Style | Reset | None:
     return next((item for item in body[::-1] if not isinstance(item, str)), None)
 
 
-def _adjust_string_idents(body: Body, token: Token) -> None:
+def _adjust_string_idents(body: Body, token: Token, theme: Theme) -> None:
     # Special case for `whatever.@"something here"`,
     # which is an identifier, so should have no string highlighting
     if (
         token.kind == '"'
-        and _last_applied_style(body) == Style(Color.GREEN)
+        and _last_applied_style(body) == theme.strings
         and len(body) > 3
         and body[-4] == "@"
     ):
-        del body[-3]
+        if theme.identifiers:
+            body[-3] = theme.identifiers
+        else:
+            del body[-3]
 
 
-def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
+def _process_zig_tokens(
+    source: bytes, tokens: Iterator[Token], theme: Theme = consts.DEFAULT_THEME
+) -> str:
     body: Body = []
     pointer = 0
     token = next(tokens)
@@ -132,9 +79,9 @@ def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
             continue
 
         style = (
-            Style(Color.BLUE)  # Special case for function calls
+            theme.calls
             if token.kind == "identifier" and _peek(tokens).kind == "("
-            else _get_style(token.kind)
+            else _get_style(token.kind, theme)
         )
         if style is None:
             if _last_applied_style(body) is not Reset.FULL:
@@ -142,7 +89,7 @@ def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
         elif _last_applied_style(body) is not style:
             body.append(style)
 
-        _adjust_string_idents(body, token)
+        _adjust_string_idents(body, token, theme)
 
         body.append(token.value.decode())
 
@@ -154,17 +101,19 @@ def _process_zig_tokens(source: bytes, tokens: Iterator[Token]) -> str:
     return "".join(map(str, body))
 
 
-def highlight_zig_code(source: str | bytes) -> str:
+def highlight_zig_code(source: str | bytes, theme: Theme = consts.DEFAULT_THEME) -> str:
     """
     Return an ANSI syntax-highlighted version of the given Zig source code.
     Assumes UTF-8 if source is `bytes`.
     """
     if isinstance(source, str):
         source = source.encode()
-    return _process_zig_tokens(source, tokenize_zig(source))
+    return _process_zig_tokens(source, tokenize_zig(source), theme)
 
 
-def process_markdown(source: str | bytes, *, only_code: bool = False) -> str:
+def process_markdown(
+    source: str | bytes, theme: Theme = consts.DEFAULT_THEME, *, only_code: bool = False
+) -> str:
     """
     Return a Markdown source with Zig code blocks syntax-highlighted.
     If `only_code` is True, only processed Zig code blocks will be returned.
@@ -177,10 +126,11 @@ def process_markdown(source: str | bytes, *, only_code: bool = False) -> str:
     )
     if only_code:
         return "\n".join(
-            f"```ansi\n{highlight_zig_code(code)}\n```" for code in zig_codeblocks
+            f"```ansi\n{highlight_zig_code(code, theme)}\n```"
+            for code in zig_codeblocks
         )
     for codeblock in zig_codeblocks:
         original_source = f"```zig\n{codeblock}```"
-        highlighted_source = f"```ansi\n{highlight_zig_code(codeblock)}\n```"
+        highlighted_source = f"```ansi\n{highlight_zig_code(codeblock, theme)}\n```"
         source = source.replace(original_source, highlighted_source)
     return source

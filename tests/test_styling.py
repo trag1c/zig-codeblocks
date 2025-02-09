@@ -1,6 +1,6 @@
 import pytest
 
-from zig_codeblocks.styling import Color, Reset, Style
+from zig_codeblocks.styling import Color, Reset, Style, Theme
 
 
 @pytest.mark.parametrize(
@@ -29,3 +29,14 @@ def test_style(color: str, bold: bool, underline: bool, expected_sgr: str) -> No
 )
 def test_reset(reset_type: str, expected_sgr: str) -> None:
     assert str(Reset[reset_type]) == expected_sgr
+
+
+def test_theme_copy() -> None:
+    original = Theme(calls=Style(Color.BLUE))
+    copy = original.copy()
+    assert original == copy
+    assert original is not copy
+
+    copy.calls = None
+    assert original != copy
+    assert original.calls is not None

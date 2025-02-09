@@ -4,8 +4,9 @@
 # zig-codeblocks
 
 `zig-codeblocks` is a CPython 3.10+ library for adding syntax highlighting to
-Zig code blocks in Markdown files through ANSI escape codes. Originally intended
-for patching the lack of syntax highlighting for Zig on Discord.
+Zig code blocks in Markdown files through ANSI escape codes.
+Originally intended for patching the lack of syntax highlighting for Zig on
+Discord.
 
 
 ## Installation
@@ -23,9 +24,10 @@ pip install git+https://github.com/trag1c/zig-codeblocks.git
 
 ### `extract_codeblocks`
 ```py
-def extract_codeblocks(source: str) -> Iterator[Codeblock]
+def extract_codeblocks(source: str | bytes) -> Iterator[CodeBlock]
 ```
 Yields [`CodeBlock`](#codeblock)s from a Markdown source.
+Assumes UTF-8 if source is `bytes`.
 
 **Example usage:**
 ```py
@@ -54,27 +56,48 @@ pub fn main() !void {
 
 ### `highlight_zig_code`
 ```py
-def highlight_zig_code(source: str) -> str
+def highlight_zig_code(source: str | bytes, theme: Theme = DEFAULT_THEME) -> str
 ```
 Returns an ANSI syntax-highlighted version of the given Zig source code.
+Assumes UTF-8 if source is `bytes`.
+An optional [`Theme`](#theme) can be supplied (defaults to
+[`DEFAULT_THEME`](#default_theme)).
 
 **Example usage:**
 ```py
 from pathlib import Path
 
-from zig_codeblocks import highlight_zig_code
+from zig_codeblocks import DEFAULT_THEME, Color, Style, highlight_zig_code
 
 source = Path("examples/hello_world.zig").read_text()
-print(highlight_zig_code(source))
+
+theme = DEFAULT_THEME.copy()
+theme.builtin_identifiers = Style(Color.ORANGE, underline=True)
+theme.strings = Style(Color.CYAN)
+theme.types = None
+
+print(
+    highlight_zig_code(source),
+    highlight_zig_code(source, theme),
+    sep="\n\n",
+)
 ```
-<img src="examples/highlighted-zig-code.png" width="55%">
+<img src="examples/highlighted-zig-code.png" width="65%">
 
 
 ### `process_markdown`
 ```py
-def process_markdown(source: str, *, only_code: bool = False) -> str
+def process_markdown(
+    source: str | bytes,
+    theme: Theme = DEFAULT_THEME,
+    *,
+    only_code: bool = False,
+) -> str
 ```
 Returns a Markdown source with Zig code blocks syntax-highlighted.
+Assumes UTF-8 if source is `bytes`.
+An optional [`Theme`](#theme) can be supplied (defaults to
+[`DEFAULT_THEME`](#default_theme)).
 If `only_code` is True, only processed Zig code blocks will be returned.
 
 **Example usage:**
@@ -96,6 +119,79 @@ class CodeBlock(NamedTuple):
     body: str
 ```
 A code block extracted from a Markdown source.
+
+
+### `Color`
+```py
+class Color(Enum):
+    GRAY = "30"
+    RED = "31"
+    GREEN = "32"
+    ORANGE = "33"
+    BLUE = "34"
+    MAGENTA = "35"
+    CYAN = "36"
+    WHITE = "37"  # Black for light mode
+```
+An enumeration of 3-bit ANSI colors.
+Some names were adjusted to match Discord's style.
+
+
+### `Style`
+```py
+@dataclass(slots=True, frozen=True)
+class Style:
+    color: Color
+    _: KW_ONLY
+    bold: bool = False
+    underline: bool = False
+```
+A style for syntax highlighting.
+Takes a [`Color`](#color) and can optionally be bold and/or underlined.
+Immutable.
+Produces an SGR sequence when converted to a string.
+
+
+### `Theme`
+```py
+@dataclass(slots=True, kw_only=True)
+class Theme:
+    builtin_identifiers: Style | None = None
+    calls: Style | None = None
+    comments: Style | None = None
+    identifiers: Style | None = None
+    keywords: Style | None = None
+    numeric: Style | None = None
+    strings: Style | None = None
+    primitive_values: Style | None = None
+    types: Style | None = None
+```
+A theme for syntax highlighting Zig code.
+Each field is optional and can be provided a [`Style`](#style) to apply to the
+corresponding token type.
+
+#### `Theme.copy`
+```py
+def copy(self) -> Theme
+```
+Returns a copy of the theme.
+
+
+### `DEFAULT_THEME`
+The default theme used for highlighting, defined as follows:
+```py
+DEFAULT_THEME = Theme(
+    builtin_identifiers=Style(Color.BLUE, bold=True),
+    calls=Style(Color.BLUE),
+    comments=Style(Color.GRAY),
+    identifiers=None,
+    keywords=Style(Color.MAGENTA),
+    numeric=Style(Color.CYAN),
+    primitive_values=Style(Color.CYAN),
+    strings=Style(Color.GREEN),
+    types=Style(Color.ORANGE),
+)
+```
 
 
 ## License
