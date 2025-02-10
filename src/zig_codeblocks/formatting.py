@@ -88,7 +88,7 @@ def _process_zig_tokens(
             else _get_style(token.kind, theme)
         )
         if style is None:
-            if _last_applied_style(body) != RESET:
+            if _last_applied_style(body) not in (RESET, None):
                 body.append(RESET)
         elif _last_applied_style(body) is not style:
             body.append(style)

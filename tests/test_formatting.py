@@ -53,6 +53,6 @@ def test_zig_highlighting(test_name: str) -> None:
 def test_highlighting_backtrack_identifier_case(theme: Theme) -> None:
     source = 'const @"identifier with spaces in it" = 0xff;'
     expected_highlighting = (
-        '\033[0mconst @\033[31m"identifier with spaces in it" \033[0m= 0xff;'
+        'const @\033[31m"identifier with spaces in it" \033[0m= 0xff;'
     )
     assert highlight_zig_code(source, theme) == expected_highlighting
