@@ -70,5 +70,9 @@ def read_expected_tokens(test_name: str) -> list[Token]:
     ],
 )
 def test_zig_parser(test_name: str) -> None:
-    source = (SOURCE_DIR / "zig_parsing" / f"{test_name}.zig").read_bytes()
+    source = (
+        (SOURCE_DIR / "zig_parsing" / f"{test_name}.zig")
+        .read_bytes()
+        .replace(b"\r\n", b"\n")
+    )
     assert list(tokenize_zig(source)) == read_expected_tokens(test_name)
