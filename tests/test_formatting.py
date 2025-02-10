@@ -9,11 +9,13 @@ SOURCE_DIR = Path(__file__).parent / "sources"
 
 
 def read_expected_styling(test_name: str) -> str:
-    return "".join(
-        json.loads(
-            (SOURCE_DIR / "formatting_results" / f"{test_name}.json").read_bytes()
-        )
-    )
+    expected_style: list[str] = []
+    for line in json.loads(
+        (SOURCE_DIR / "formatting_results" / f"{test_name}.json").read_bytes()
+    ):
+        style, _, content = line.partition(":")
+        expected_style.append(f"\x1b[{style}m{content}")
+    return "".join(expected_style)
 
 
 @pytest.mark.parametrize(
