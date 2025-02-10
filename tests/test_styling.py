@@ -1,6 +1,6 @@
 import pytest
 
-from zig_codeblocks.styling import Color, Reset, Style, Theme
+from zig_codeblocks.styling import Color, Style, Theme
 
 
 @pytest.mark.parametrize(
@@ -21,14 +21,6 @@ from zig_codeblocks.styling import Color, Reset, Style, Theme
 def test_style(color: str, bold: bool, underline: bool, expected_sgr: str) -> None:
     style = Style(Color[color], bold=bold, underline=underline)
     assert str(style) == expected_sgr
-
-
-@pytest.mark.parametrize(
-    ("reset_type", "expected_sgr"),
-    [("FULL", "\033[0m"), ("BOLD", "\033[21m"), ("UNDERLINE", "\033[24m")],
-)
-def test_reset(reset_type: str, expected_sgr: str) -> None:
-    assert str(Reset[reset_type]) == expected_sgr
 
 
 def test_theme_copy() -> None:

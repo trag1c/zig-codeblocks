@@ -9,13 +9,7 @@ def _to_sgr(*args: str) -> str:
     return f"\033[{';'.join(args)}m"
 
 
-class Reset(Enum):
-    FULL = "0"
-    BOLD = "21"
-    UNDERLINE = "24"
-
-    def __str__(self) -> str:
-        return _to_sgr(self.value)
+RESET = _to_sgr("0")
 
 
 class Color(Enum):

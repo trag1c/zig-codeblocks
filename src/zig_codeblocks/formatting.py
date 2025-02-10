@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING, TypeVar
 
 from zig_codeblocks import consts
 from zig_codeblocks.parsing import extract_codeblocks, tokenize_zig
-from zig_codeblocks.styling import Reset, Style, Theme
+from zig_codeblocks.styling import RESET, Style, Theme
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from zig_codeblocks.parsing import Token
 
-Body = list[str | Style | Reset]
+Body = list[str | Style]
 T = TypeVar("T")
 
 
@@ -38,8 +38,11 @@ def _peek(iterator: Iterator[T]) -> T:
     return next(tee(iterator, 1)[0])
 
 
-def _last_applied_style(body: Body) -> Style | Reset | None:
-    return next((item for item in body[::-1] if not isinstance(item, str)), None)
+def _last_applied_style(body: Body) -> Style | str | None:
+    return next(
+        (item for item in body[::-1] if not isinstance(item, str) or item == RESET),
+        None,
+    )
 
 
 def _adjust_string_idents(body: Body, token: Token, theme: Theme) -> None:
@@ -69,7 +72,7 @@ def _process_zig_tokens(
         filler = source[pointer : token.byte_range.start]
         match filler.isspace(), _last_applied_style(body):
             case (False, _) | (True, Style(underline=True) | Style(bold=True)):
-                body.append(Reset.FULL)
+                body.append(RESET)
         body.append(filler.decode())
         pointer = token.byte_range.start
 
@@ -84,8 +87,8 @@ def _process_zig_tokens(
             else _get_style(token.kind, theme)
         )
         if style is None:
-            if _last_applied_style(body) is not Reset.FULL:
-                body.append(Reset.FULL)
+            if _last_applied_style(body) != RESET:
+                body.append(RESET)
         elif _last_applied_style(body) is not style:
             body.append(style)
 
