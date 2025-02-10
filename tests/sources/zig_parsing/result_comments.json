@@ -1,0 +1,205 @@
+[
+    {
+        "kind": "const",
+        "start": 0,
+        "end": 5
+    },
+    {
+        "kind": "identifier",
+        "value": "print",
+        "start": 6,
+        "end": 11
+    },
+    {
+        "kind": "=",
+        "start": 12,
+        "end": 13
+    },
+    {
+        "kind": "builtin_identifier",
+        "value": "@import",
+        "start": 14,
+        "end": 21
+    },
+    {
+        "kind": "(",
+        "start": 21,
+        "end": 22
+    },
+    {
+        "kind": "\"",
+        "start": 22,
+        "end": 23
+    },
+    {
+        "kind": "string_content",
+        "value": "std",
+        "start": 23,
+        "end": 26
+    },
+    {
+        "kind": "\"",
+        "start": 26,
+        "end": 27
+    },
+    {
+        "kind": ")",
+        "start": 27,
+        "end": 28
+    },
+    {
+        "kind": ".",
+        "start": 28,
+        "end": 29
+    },
+    {
+        "kind": "identifier",
+        "value": "debug",
+        "start": 29,
+        "end": 34
+    },
+    {
+        "kind": ".",
+        "start": 34,
+        "end": 35
+    },
+    {
+        "kind": "identifier",
+        "value": "print",
+        "start": 35,
+        "end": 40
+    },
+    {
+        "kind": ";",
+        "start": 40,
+        "end": 41
+    },
+    {
+        "kind": "pub",
+        "start": 43,
+        "end": 46
+    },
+    {
+        "kind": "fn",
+        "start": 47,
+        "end": 49
+    },
+    {
+        "kind": "identifier",
+        "value": "main",
+        "start": 50,
+        "end": 54
+    },
+    {
+        "kind": "(",
+        "start": 54,
+        "end": 55
+    },
+    {
+        "kind": ")",
+        "start": 55,
+        "end": 56
+    },
+    {
+        "kind": "void",
+        "start": 57,
+        "end": 61
+    },
+    {
+        "kind": "{",
+        "start": 62,
+        "end": 63
+    },
+    {
+        "kind": "comment",
+        "value": "// Comments in Zig start with \"//\" and end at the next LF byte (end of line).",
+        "start": 68,
+        "end": 145
+    },
+    {
+        "kind": "comment",
+        "value": "// The line below is a comment and won't be executed.",
+        "start": 150,
+        "end": 203
+    },
+    {
+        "kind": "comment",
+        "value": "//print(\"Hello?\", .{});",
+        "start": 209,
+        "end": 232
+    },
+    {
+        "kind": "identifier",
+        "value": "print",
+        "start": 238,
+        "end": 243
+    },
+    {
+        "kind": "(",
+        "start": 243,
+        "end": 244
+    },
+    {
+        "kind": "\"",
+        "start": 244,
+        "end": 245
+    },
+    {
+        "kind": "string_content",
+        "value": "Hello, world!",
+        "start": 245,
+        "end": 258
+    },
+    {
+        "kind": "escape_sequence",
+        "value": "\\n",
+        "start": 258,
+        "end": 260
+    },
+    {
+        "kind": "\"",
+        "start": 260,
+        "end": 261
+    },
+    {
+        "kind": ",",
+        "start": 261,
+        "end": 262
+    },
+    {
+        "kind": ".",
+        "start": 263,
+        "end": 264
+    },
+    {
+        "kind": "{",
+        "start": 264,
+        "end": 265
+    },
+    {
+        "kind": "}",
+        "start": 265,
+        "end": 266
+    },
+    {
+        "kind": ")",
+        "start": 266,
+        "end": 267
+    },
+    {
+        "kind": ";",
+        "start": 267,
+        "end": 268
+    },
+    {
+        "kind": "comment",
+        "value": "// another comment",
+        "start": 269,
+        "end": 287
+    },
+    {
+        "kind": "}",
+        "start": 288,
+        "end": 289
+    }
+]

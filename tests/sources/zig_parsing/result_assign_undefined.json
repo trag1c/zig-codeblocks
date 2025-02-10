@@ -1,0 +1,240 @@
+[
+    {
+        "kind": "const",
+        "start": 0,
+        "end": 5
+    },
+    {
+        "kind": "identifier",
+        "value": "print",
+        "start": 6,
+        "end": 11
+    },
+    {
+        "kind": "=",
+        "start": 12,
+        "end": 13
+    },
+    {
+        "kind": "builtin_identifier",
+        "value": "@import",
+        "start": 14,
+        "end": 21
+    },
+    {
+        "kind": "(",
+        "start": 21,
+        "end": 22
+    },
+    {
+        "kind": "\"",
+        "start": 22,
+        "end": 23
+    },
+    {
+        "kind": "string_content",
+        "value": "std",
+        "start": 23,
+        "end": 26
+    },
+    {
+        "kind": "\"",
+        "start": 26,
+        "end": 27
+    },
+    {
+        "kind": ")",
+        "start": 27,
+        "end": 28
+    },
+    {
+        "kind": ".",
+        "start": 28,
+        "end": 29
+    },
+    {
+        "kind": "identifier",
+        "value": "debug",
+        "start": 29,
+        "end": 34
+    },
+    {
+        "kind": ".",
+        "start": 34,
+        "end": 35
+    },
+    {
+        "kind": "identifier",
+        "value": "print",
+        "start": 35,
+        "end": 40
+    },
+    {
+        "kind": ";",
+        "start": 40,
+        "end": 41
+    },
+    {
+        "kind": "pub",
+        "start": 43,
+        "end": 46
+    },
+    {
+        "kind": "fn",
+        "start": 47,
+        "end": 49
+    },
+    {
+        "kind": "identifier",
+        "value": "main",
+        "start": 50,
+        "end": 54
+    },
+    {
+        "kind": "(",
+        "start": 54,
+        "end": 55
+    },
+    {
+        "kind": ")",
+        "start": 55,
+        "end": 56
+    },
+    {
+        "kind": "void",
+        "start": 57,
+        "end": 61
+    },
+    {
+        "kind": "{",
+        "start": 62,
+        "end": 63
+    },
+    {
+        "kind": "var",
+        "start": 68,
+        "end": 71
+    },
+    {
+        "kind": "identifier",
+        "value": "x",
+        "start": 72,
+        "end": 73
+    },
+    {
+        "kind": ":",
+        "start": 73,
+        "end": 74
+    },
+    {
+        "kind": "builtin_type",
+        "value": "i32",
+        "start": 75,
+        "end": 78
+    },
+    {
+        "kind": "=",
+        "start": 79,
+        "end": 80
+    },
+    {
+        "kind": "undefined",
+        "start": 81,
+        "end": 90
+    },
+    {
+        "kind": ";",
+        "start": 90,
+        "end": 91
+    },
+    {
+        "kind": "identifier",
+        "value": "x",
+        "start": 96,
+        "end": 97
+    },
+    {
+        "kind": "=",
+        "start": 98,
+        "end": 99
+    },
+    {
+        "kind": "integer",
+        "value": "1",
+        "start": 100,
+        "end": 101
+    },
+    {
+        "kind": ";",
+        "start": 101,
+        "end": 102
+    },
+    {
+        "kind": "identifier",
+        "value": "print",
+        "start": 107,
+        "end": 112
+    },
+    {
+        "kind": "(",
+        "start": 112,
+        "end": 113
+    },
+    {
+        "kind": "\"",
+        "start": 113,
+        "end": 114
+    },
+    {
+        "kind": "string_content",
+        "value": "{d}",
+        "start": 114,
+        "end": 117
+    },
+    {
+        "kind": "\"",
+        "start": 117,
+        "end": 118
+    },
+    {
+        "kind": ",",
+        "start": 118,
+        "end": 119
+    },
+    {
+        "kind": ".",
+        "start": 120,
+        "end": 121
+    },
+    {
+        "kind": "{",
+        "start": 121,
+        "end": 122
+    },
+    {
+        "kind": "identifier",
+        "value": "x",
+        "start": 122,
+        "end": 123
+    },
+    {
+        "kind": "}",
+        "start": 123,
+        "end": 124
+    },
+    {
+        "kind": ")",
+        "start": 124,
+        "end": 125
+    },
+    {
+        "kind": ";",
+        "start": 125,
+        "end": 126
+    },
+    {
+        "kind": "}",
+        "start": 127,
+        "end": 128
+    }
+]
