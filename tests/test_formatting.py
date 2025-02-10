@@ -36,5 +36,7 @@ def test_zig_highlighting(test_name: str) -> None:
         .replace(b"\r\n", b"\n")
         .decode()
     )
+    source = f"```zig\n{source}```"
     expected_styling = f"```ansi\n{read_expected_styling(test_name)}\n```"
-    assert process_markdown(f"```zig\n{source}```", only_code=True) == expected_styling
+    assert process_markdown(source, only_code=True) == expected_styling
+    assert process_markdown(source.encode(), only_code=True) == expected_styling
