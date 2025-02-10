@@ -18,19 +18,19 @@ T = TypeVar("T")
 
 def _get_style(kind: str, theme: Theme) -> Style | None:
     for options, style in (
-        (consts.IDENTIFIERS, theme.identifiers),
-        (consts.KEYWORDS, theme.keywords),
-        (consts.NUMERIC_LITERALS, theme.numeric),
-        (consts.PRIMITIVE_VALUES, theme.primitive_values),
-        (consts.STRINGLIKE, theme.strings),
-        (consts.TYPES, theme.types),
+        (consts.IDENTIFIERS, theme.get("identifiers")),
+        (consts.KEYWORDS, theme.get("keywords")),
+        (consts.NUMERIC_LITERALS, theme.get("numeric")),
+        (consts.PRIMITIVE_VALUES, theme.get("primitive_values")),
+        (consts.STRINGLIKE, theme.get("strings")),
+        (consts.TYPES, theme.get("types")),
     ):
         if kind in options:
             return style
     if kind == "comment":
-        return theme.comments
+        return theme.get("comments")
     if kind == "builtin_identifier":
-        return theme.builtin_identifiers
+        return theme.get("builtin_identifiers")
     return None
 
 
@@ -48,15 +48,17 @@ def _last_applied_style(body: Body) -> Style | str | None:
 def _adjust_string_idents(body: Body, token: Token, theme: Theme) -> None:
     # Special case for `whatever.@"something here"`,
     # which is an identifier, so should have no string highlighting
-    if not ((theme.identifiers or theme.strings) and token.kind == '"'):
+    identifier_style = theme.get("identifiers")
+    string_style = theme.get("strings")
+    if not ((identifier_style or string_style) and token.kind == '"'):
         return
-    if not theme.strings:
+    if not string_style:
         if len(body) > 2 and body[-3] == "@":
-            body.insert(-2, cast(Style, theme.identifiers))
+            body.insert(-2, cast(Style, identifier_style))
         return
-    if _last_applied_style(body) == theme.strings and len(body) > 3 and body[-4] == "@":
-        if theme.identifiers:
-            body[-3] = theme.identifiers
+    if _last_applied_style(body) == string_style and len(body) > 3 and body[-4] == "@":
+        if identifier_style:
+            body[-3] = identifier_style
         else:
             del body[-3]
 
@@ -85,7 +87,7 @@ def _process_zig_tokens(
             continue
 
         style = (
-            theme.calls
+            theme.get("calls")
             if token.kind == "identifier" and _peek(tokens).kind == "("
             else _get_style(token.kind, theme)
         )

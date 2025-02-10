@@ -46,8 +46,8 @@ def test_zig_highlighting(test_name: str) -> None:
 @pytest.mark.parametrize(
     "theme",
     [
-        Theme(identifiers=Style(Color.RED)),
-        Theme(identifiers=Style(Color.RED), strings=Style(Color.GREEN)),
+        {"identifiers": Style(Color.RED)},
+        {"identifiers": Style(Color.RED), "strings": Style(Color.GREEN)},
     ],
 )
 def test_highlighting_backtrack_identifier_case(theme: Theme) -> None:

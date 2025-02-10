@@ -154,27 +154,36 @@ Produces an SGR sequence when converted to a string.
 
 ### `Theme`
 ```py
-@dataclass(slots=True, kw_only=True)
-class Theme:
-    builtin_identifiers: Style | None = None
-    calls: Style | None = None
-    comments: Style | None = None
-    identifiers: Style | None = None
-    keywords: Style | None = None
-    numeric: Style | None = None
-    strings: Style | None = None
-    primitive_values: Style | None = None
-    types: Style | None = None
+class Theme(TypedDict, total=False):
+    builtin_identifiers: Style
+    calls: Style
+    comments: Style
+    identifiers: Style
+    keywords: Style
+    numeric: Style
+    strings: Style
+    primitive_values: Style
+    types: Style
 ```
-A theme for syntax highlighting Zig code.
-Each field is optional and can be provided a [`Style`](#style) to apply to the
+A theme dict for syntax highlighting Zig code.
+Each key is optional and can be provided a [`Style`](#style) to apply to the
 corresponding token type.
-
-#### `Theme.copy`
+Can be instantiated with a dict literal or with a `Theme` call:
 ```py
-def copy(self) -> Theme
+from zig_codeblocks import Color, Style, Theme
+
+theme_foo = Theme(
+    numeric=Style(Color.BLUE),
+    strings=Style(Color.GREEN),
+)
+
+theme_bar: Theme = {
+    "numeric": Style(Color.BLUE),
+    "strings": Style(Color.GREEN),
+}
+
+assert theme_foo == theme_bar
 ```
-Returns a copy of the theme.
 
 
 ### `DEFAULT_THEME`
@@ -184,7 +193,6 @@ DEFAULT_THEME = Theme(
     builtin_identifiers=Style(Color.BLUE, bold=True),
     calls=Style(Color.BLUE),
     comments=Style(Color.GRAY),
-    identifiers=None,
     keywords=Style(Color.MAGENTA),
     numeric=Style(Color.CYAN),
     primitive_values=Style(Color.CYAN),
