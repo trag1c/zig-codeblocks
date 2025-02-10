@@ -35,6 +35,4 @@ def test_zig_highlighting(test_name: str) -> None:
         .decode()
     )
     expected_styling = f"```ansi\n{read_expected_styling(test_name)}\n```"
-    # print(">", process_markdown(f"```zig\n{source}```"))
-    # print("<", expected_styling)
     assert process_markdown(f"```zig\n{source}```", only_code=True) == expected_styling
