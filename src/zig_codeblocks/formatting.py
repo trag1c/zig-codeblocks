@@ -74,9 +74,7 @@ def _process_zig_tokens(
         match filler.isspace(), _last_applied_style(body):
             case (_, None):
                 pass
-            case (True, Style(underline=True) | Style(bold=True)):
-                body.append(RESET)
-            case (False, Style()):
+            case (True, Style(underline=True) | Style(bold=True)) | (False, Style()):
                 body.append(RESET)
         body.append(filler.decode())
         pointer = token.byte_range.start
