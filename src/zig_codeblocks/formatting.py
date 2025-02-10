@@ -72,7 +72,11 @@ def _process_zig_tokens(
         nonlocal pointer
         filler = source[pointer : token.byte_range.start]
         match filler.isspace(), _last_applied_style(body):
-            case (False, _) | (True, Style(underline=True) | Style(bold=True)):
+            case (_, None):
+                pass
+            case (True, Style(underline=True) | Style(bold=True)):
+                body.append(RESET)
+            case (False, Style()):
                 body.append(RESET)
         body.append(filler.decode())
         pointer = token.byte_range.start
