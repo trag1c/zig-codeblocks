@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import tee
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, cast
 
 from zig_codeblocks import consts
 from zig_codeblocks.parsing import extract_codeblocks, tokenize_zig
@@ -48,12 +48,13 @@ def _last_applied_style(body: Body) -> Style | str | None:
 def _adjust_string_idents(body: Body, token: Token, theme: Theme) -> None:
     # Special case for `whatever.@"something here"`,
     # which is an identifier, so should have no string highlighting
-    if (
-        token.kind == '"'
-        and _last_applied_style(body) == theme.strings
-        and len(body) > 3
-        and body[-4] == "@"
-    ):
+    if not ((theme.identifiers or theme.strings) and token.kind == '"'):
+        return
+    if not theme.strings:
+        if len(body) > 2 and body[-3] == "@":
+            body.insert(-2, cast(Style, theme.identifiers))
+        return
+    if _last_applied_style(body) == theme.strings and len(body) > 3 and body[-4] == "@":
         if theme.identifiers:
             body[-3] = theme.identifiers
         else:

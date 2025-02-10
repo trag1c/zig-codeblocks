@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from zig_codeblocks.formatting import process_markdown
+from zig_codeblocks.formatting import highlight_zig_code, process_markdown
+from zig_codeblocks.styling import Color, Style, Theme
 
 SOURCE_DIR = Path(__file__).parent / "sources"
 
@@ -40,3 +41,18 @@ def test_zig_highlighting(test_name: str) -> None:
     expected_styling = f"```ansi\n{read_expected_styling(test_name)}\n```"
     assert process_markdown(source, only_code=True) == expected_styling
     assert process_markdown(source.encode(), only_code=True) == expected_styling
+
+
+@pytest.mark.parametrize(
+    "theme",
+    [
+        Theme(identifiers=Style(Color.RED)),
+        Theme(identifiers=Style(Color.RED), strings=Style(Color.GREEN)),
+    ],
+)
+def test_highlighting_backtrack_identifier_case(theme: Theme) -> None:
+    source = 'const @"identifier with spaces in it" = 0xff;'
+    expected_highlighting = (
+        '\033[0mconst @\033[31m"identifier with spaces in it" \033[0m= 0xff;'
+    )
+    assert highlight_zig_code(source, theme) == expected_highlighting
