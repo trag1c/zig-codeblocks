@@ -53,7 +53,7 @@ def read_expected_tokens(test_name: str) -> list[Token]:
             byte_range=range(t["start"], t["end"]),
         )
         for t in json.loads(
-            (SOURCE_DIR / "zig_parsing" / f"result_{test_name}.json").read_bytes()
+            (SOURCE_DIR / "parsing_results" / f"{test_name}.json").read_bytes()
         )
     ]
 
@@ -71,7 +71,7 @@ def read_expected_tokens(test_name: str) -> list[Token]:
 )
 def test_zig_parser(test_name: str) -> None:
     source = (
-        (SOURCE_DIR / "zig_parsing" / f"{test_name}.zig")
+        (SOURCE_DIR / "zig_inputs" / f"{test_name}.zig")
         .read_bytes()
         .replace(b"\r\n", b"\n")
     )
