@@ -1,6 +1,6 @@
 [project]
 name = "zig-codeblocks"
-version = "0.2.0"
+version = "0.2.1"
 description = "Zig ANSI syntax highlighting library"
 readme = "README.md"
 license = "MIT"
