@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from itertools import tee
 from typing import TYPE_CHECKING, TypeVar, cast
 
@@ -138,7 +139,10 @@ def process_markdown(
             for code in zig_codeblocks
         )
     for codeblock in zig_codeblocks:
-        original_source = f"```zig\n{codeblock}```"
         highlighted_source = f"```ansi\n{highlight_zig_code(codeblock, theme)}\n```"
-        source = source.replace(original_source, highlighted_source)
+        source = re.sub(
+            f"```zig\n{re.escape(codeblock)}(?:\r?\n)*```",
+            highlighted_source.replace("\\", r"\\"),
+            source,
+        )
     return source

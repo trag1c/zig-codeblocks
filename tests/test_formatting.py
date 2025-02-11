@@ -19,6 +19,7 @@ def read_expected_styling(test_name: str) -> str:
     return "".join(expected_style)
 
 
+@pytest.mark.parametrize("only_code", [True, False])
 @pytest.mark.parametrize(
     "test_name",
     [
@@ -30,7 +31,7 @@ def read_expected_styling(test_name: str) -> str:
         "identifiers",
     ],
 )
-def test_zig_highlighting(test_name: str) -> None:
+def test_zig_highlighting(test_name: str, only_code: bool) -> None:
     source = (
         (SOURCE_DIR / "zig_inputs" / f"{test_name}.zig")
         .read_bytes()
@@ -39,8 +40,8 @@ def test_zig_highlighting(test_name: str) -> None:
     )
     source = f"```zig\n{source}```"
     expected_styling = f"```ansi\n{read_expected_styling(test_name)}\n```"
-    assert process_markdown(source, only_code=True) == expected_styling
-    assert process_markdown(source.encode(), only_code=True) == expected_styling
+    assert process_markdown(source, only_code=only_code) == expected_styling
+    assert process_markdown(source.encode(), only_code=only_code) == expected_styling
 
 
 @pytest.mark.parametrize(
