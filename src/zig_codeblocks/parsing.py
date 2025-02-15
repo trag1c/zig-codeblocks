@@ -7,7 +7,7 @@ import tree_sitter as ts
 import tree_sitter_zig
 
 CODE_BLOCK_PATTERN = re.compile(
-    r"```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].+?)|(.*?))```", re.DOTALL
+    r"```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].*?)|(.*?))```", re.DOTALL
 )
 
 ZIG_PARSER = ts.Parser(ts.Language(tree_sitter_zig.language()))
