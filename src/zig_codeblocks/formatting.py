@@ -35,8 +35,8 @@ def _get_style(kind: str, theme: Theme) -> Style | None:
     return None
 
 
-def _peek(iterator: Iterator[T]) -> T:
-    return next(tee(iterator, 1)[0])
+def _peek(iterator: Iterator[T]) -> T | None:
+    return next(tee(iterator, 1)[0], None)
 
 
 def _last_applied_style(body: Body) -> Style | str | None:
@@ -89,7 +89,9 @@ def _process_zig_tokens(
 
         style = (
             theme.get("calls")
-            if token.kind == "identifier" and _peek(tokens).kind == "("
+            if token.kind == "identifier"
+            and (next_token := _peek(tokens))
+            and next_token.kind == "("
             else _get_style(token.kind, theme)
         )
         if style is None:

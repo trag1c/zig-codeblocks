@@ -67,3 +67,11 @@ def test_reset_optimization() -> None:
     )
     expected_highlighting = f" {blue_u}const\033[0m {red}x\033[0m = 0xff;"
     assert highlight_zig_code(source, theme) == expected_highlighting
+
+
+def test_safe_peek() -> None:
+    src = "just_an_identifier"
+    assert highlight_zig_code(src) == src
+
+    theme = Theme(identifiers=(red := Style(Color.RED)))
+    assert highlight_zig_code(src, theme) == f"{red}{src}"

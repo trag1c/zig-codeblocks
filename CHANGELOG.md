@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Code blocks with 1-char-long bodies are now correctly detected
+- Zig sources ending with an identifier token no longer crash the highlighter
 
 ## [v0.2.1] - 2025-02-11
 
