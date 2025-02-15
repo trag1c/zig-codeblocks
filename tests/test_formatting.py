@@ -62,8 +62,8 @@ def test_highlighting_backtrack_identifier_case(theme: Theme) -> None:
 def test_reset_optimization() -> None:
     source = " const x = 0xff;"
     theme = Theme(
-        identifiers=Style(Color.RED),
-        keywords=Style(Color.BLUE, underline=True),
+        identifiers=(red := Style(Color.RED)),
+        keywords=(blue_u := Style(Color.BLUE, underline=True)),
     )
-    expected_highlighting = " \033[34;4mconst\033[0m \033[31mx\033[0m = 0xff;"
+    expected_highlighting = f" {blue_u}const\033[0m {red}x\033[0m = 0xff;"
     assert highlight_zig_code(source, theme) == expected_highlighting
