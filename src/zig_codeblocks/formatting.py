@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import re
-from itertools import tee
 from typing import TYPE_CHECKING, TypeVar, cast
+
+from more_itertools import peekable
 
 from zig_codeblocks import consts
 from zig_codeblocks.parsing import extract_codeblocks, tokenize_zig
@@ -35,10 +36,6 @@ def _get_style(kind: str, theme: Theme) -> Style | None:
     return None
 
 
-def _peek(iterator: Iterator[T]) -> T | None:
-    return next(tee(iterator, 1)[0], None)
-
-
 def _last_applied_style(body: Body) -> Style | str | None:
     return next(
         (item for item in body[::-1] if not isinstance(item, str) or item == RESET),
@@ -69,6 +66,7 @@ def _process_zig_tokens(
 ) -> str:
     body: Body = []
     pointer = 0
+    tokens = peekable(tokens)
     token = next(tokens)
 
     def skip_to_token() -> None:
@@ -90,7 +88,7 @@ def _process_zig_tokens(
         style = (
             theme.get("calls")
             if token.kind == "identifier"
-            and (next_token := _peek(tokens))
+            and (next_token := tokens.peek(None))
             and next_token.kind == "("
             else _get_style(token.kind, theme)
         )

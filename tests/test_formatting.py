@@ -65,7 +65,7 @@ def test_reset_optimization() -> None:
         identifiers=(red := Style(Color.RED)),
         keywords=(blue_u := Style(Color.BLUE, underline=True)),
     )
-    expected_highlighting = f" {blue_u}const\033[0m {red}x\033[0m = 0xff;"
+    expected_highlighting = f" {blue_u}const\033[0m {red}x \033[0m= 0xff;"
     assert highlight_zig_code(source, theme) == expected_highlighting
 
 
