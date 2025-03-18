@@ -1,0 +1,145 @@
+use pyo3::prelude::*;
+use regex::bytes::Regex;
+use std::sync::LazyLock;
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct Token {
+    pub kind: String,
+    pub value: Vec<u8>,
+    pub byte_range: (usize, usize),
+}
+
+#[pyclass(eq, get_all)]
+#[derive(PartialEq, Eq)]
+pub struct CodeBlock {
+    pub lang: Option<String>,
+    pub body: String,
+}
+
+#[pymethods]
+impl CodeBlock {
+    #[new]
+    pub fn new(lang: Option<String>, body: &str) -> Self {
+        Self {
+            lang,
+            body: body.trim_matches(['\r', '\n']).into(),
+        }
+    }
+
+    fn __repr__(&self) -> String {
+        let lang_repr = if let Some(lang) = &self.lang {
+            format!("{lang:?}")
+        } else {
+            String::from("None")
+        };
+        format!("CodeBlock(lang={lang_repr}, body={:?})", self.body)
+    }
+}
+
+static CODE_BLOCK_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?s)```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].*?)|(.*?))```").unwrap()
+});
+
+fn get_parser() -> tree_sitter::Parser {
+    let mut parser = tree_sitter::Parser::new();
+    let language = tree_sitter_zig::LANGUAGE;
+    parser
+        .set_language(&language.into())
+        .expect("error loading Zig parser");
+    parser
+}
+
+pub fn tokenize_zig(src: &[u8]) -> Vec<Token> {
+    let mut parser = get_parser();
+    let tree = parser.parse(src, None).unwrap();
+    traverse(tree.root_node(), src)
+}
+
+fn traverse(root: tree_sitter::Node, src: &[u8]) -> Vec<Token> {
+    let mut tokens = Vec::new();
+    let mut stack = vec![root];
+
+    while let Some(node) = stack.pop() {
+        if node.child_count() > 0 {
+            stack.extend(
+                (0..node.child_count())
+                    .rev()
+                    .map(|i| node.child(i).unwrap()),
+            );
+            continue;
+        }
+        tokens.push(Token {
+            kind: node.kind().to_string(),
+            value: src[node.start_byte()..node.end_byte()].to_vec(),
+            byte_range: (node.start_byte(), node.end_byte()),
+        });
+    }
+    tokens
+}
+
+fn match_to_utf8(r#match: regex::bytes::Match<'_>) -> String {
+    String::from_utf8_lossy(r#match.as_bytes()).to_string()
+}
+
+pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
+    CODE_BLOCK_PATTERN
+        .captures_iter(source)
+        .map(|m| {
+            let (lang, body, no_lang_body) = (m.get(1), m.get(2), m.get(3));
+            if lang.is_some() {
+                CodeBlock::new(
+                    lang.map(|m| match_to_utf8(m)),
+                    &match_to_utf8(body.unwrap()),
+                )
+            } else {
+                CodeBlock::new(None, &match_to_utf8(no_lang_body.unwrap()))
+            }
+        })
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{tokenize_zig, Token};
+
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Serialize, Deserialize)]
+    struct OutputToken {
+        kind: String,
+        value: Option<String>,
+        range: (usize, usize),
+    }
+
+    macro_rules! make_test {
+        ($name:ident) => {
+            #[test]
+            fn $name() {
+                let src_path = concat!("tests/sources/zig_inputs/", stringify!($name), ".zig");
+                let out_path = concat!("tests/sources/parsing_results/", stringify!($name), ".json");
+                let source = std::fs::read(src_path).unwrap();
+                assert_eq!(tokenize_zig(&source), read_expected_tokens(out_path));
+            }
+            
+        };
+    }
+
+    fn read_expected_tokens(path: &str) -> Vec<Token> {
+        let content = std::fs::read_to_string(path).unwrap();
+        let t: Vec<OutputToken> = serde_json::from_str(&content).unwrap();
+        t.into_iter()
+            .map(|ot| Token {
+                kind: ot.kind.clone(),
+                value: ot.value.unwrap_or(ot.kind).as_bytes().to_vec(),
+                byte_range: ot.range,
+            })
+            .collect::<Vec<_>>()
+    }
+
+    make_test!(assign_undefined);
+    make_test!(comments);
+    make_test!(emoji);
+    make_test!(global_assembly);
+    make_test!(hello_again);
+    make_test!(identifiers);
+}

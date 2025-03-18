@@ -3,8 +3,8 @@
 
 # zig-codeblocks
 
-`zig-codeblocks` is a CPython 3.10+ library for adding syntax highlighting to
-Zig code blocks in Markdown files through ANSI escape codes.
+`zig-codeblocks` is a Rust-powered CPython 3.9+ library for adding syntax
+highlighting to Zig code blocks in Markdown files through ANSI escape codes.
 Originally intended for patching the lack of syntax highlighting for Zig on
 Discord.
 
@@ -24,7 +24,7 @@ pip install git+https://github.com/trag1c/zig-codeblocks.git
 
 ### `extract_codeblocks`
 ```py
-def extract_codeblocks(source: str | bytes) -> Iterator[CodeBlock]
+def extract_codeblocks(source: str | bytes) -> list[CodeBlock]
 ```
 Yields [`CodeBlock`](#codeblock)s from a Markdown source.
 Assumes UTF-8 if source is `bytes`.
@@ -72,8 +72,8 @@ from zig_codeblocks import DEFAULT_THEME, Color, Style, highlight_zig_code
 source = Path("examples/hello_world.zig").read_text()
 
 theme = DEFAULT_THEME.copy()
-theme.builtin_identifiers = Style(Color.ORANGE, underline=True)
-theme.strings = Style(Color.CYAN)
+theme.builtin_identifiers = Style(Color.Orange, underline=True)
+theme.strings = Style(Color.Cyan)
 theme.types = None
 
 print(
@@ -114,7 +114,7 @@ print(process_markdown(source))
 
 ### `CodeBlock`
 ```py
-class CodeBlock(NamedTuple):
+class CodeBlock:
     lang: str
     body: str
 ```
@@ -139,10 +139,8 @@ Some names were adjusted to match Discord's style.
 
 ### `Style`
 ```py
-@dataclass(slots=True, frozen=True)
 class Style:
     color: Color
-    _: KW_ONLY
     bold: bool = False
     underline: bool = False
 ```
@@ -173,13 +171,13 @@ Can be instantiated with a dict literal or with a `Theme` call:
 from zig_codeblocks import Color, Style, Theme
 
 theme_foo = Theme(
-    numeric=Style(Color.BLUE),
-    strings=Style(Color.GREEN),
+    numeric=Style(Color.Blue),
+    strings=Style(Color.Green),
 )
 
 theme_bar: Theme = {
-    "numeric": Style(Color.BLUE),
-    "strings": Style(Color.GREEN),
+    "numeric": Style(Color.Blue),
+    "strings": Style(Color.Green),
 }
 
 assert theme_foo == theme_bar
@@ -190,14 +188,14 @@ assert theme_foo == theme_bar
 The default theme used for highlighting, defined as follows:
 ```py
 DEFAULT_THEME = Theme(
-    builtin_identifiers=Style(Color.BLUE, bold=True),
-    calls=Style(Color.BLUE),
-    comments=Style(Color.GRAY),
-    keywords=Style(Color.MAGENTA),
-    numeric=Style(Color.CYAN),
-    primitive_values=Style(Color.CYAN),
-    strings=Style(Color.GREEN),
-    types=Style(Color.ORANGE),
+    builtin_identifiers=Style(Color.Blue, bold=True),
+    calls=Style(Color.Blue),
+    comments=Style(Color.Gray),
+    keywords=Style(Color.Magenta),
+    numeric=Style(Color.Cyan),
+    primitive_values=Style(Color.Cyan),
+    strings=Style(Color.Green),
+    types=Style(Color.Orange),
 )
 ```
 

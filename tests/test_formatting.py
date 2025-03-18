@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from zig_codeblocks.formatting import highlight_zig_code, process_markdown
-from zig_codeblocks.styling import Color, Style, Theme
+from zig_codeblocks import Color, Style, highlight_zig_code, process_markdown
+
+if TYPE_CHECKING:
+    from zig_codeblocks._core import Theme
 
 SOURCE_DIR = Path(__file__).parent / "sources"
 
@@ -47,8 +52,8 @@ def test_zig_highlighting(test_name: str, only_code: bool) -> None:
 @pytest.mark.parametrize(
     "theme",
     [
-        {"identifiers": Style(Color.RED)},
-        {"identifiers": Style(Color.RED), "strings": Style(Color.GREEN)},
+        {"Identifier": Style(Color.Red)},
+        {"Identifier": Style(Color.Red), "String": Style(Color.Green)},
     ],
 )
 def test_highlighting_backtrack_identifier_case(theme: Theme) -> None:
@@ -61,10 +66,10 @@ def test_highlighting_backtrack_identifier_case(theme: Theme) -> None:
 
 def test_reset_optimization() -> None:
     source = " const x = 0xff;"
-    theme = Theme(
-        identifiers=(red := Style(Color.RED)),
-        keywords=(blue_u := Style(Color.BLUE, underline=True)),
-    )
+    theme: Theme = {
+        "Identifier": (red := Style(Color.Red)),
+        "Keyword": (blue_u := Style(Color.Blue, underline=True)),
+    }
     expected_highlighting = f" {blue_u}const\033[0m {red}x \033[0m= 0xff;"
     assert highlight_zig_code(source, theme) == expected_highlighting
 
@@ -73,5 +78,5 @@ def test_safe_peek() -> None:
     src = "just_an_identifier"
     assert highlight_zig_code(src) == src
 
-    theme = Theme(identifiers=(red := Style(Color.RED)))
+    theme: Theme = {"Identifier": (red := Style(Color.Red))}
     assert highlight_zig_code(src, theme) == f"{red}{src}"

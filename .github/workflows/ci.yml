@@ -8,10 +8,25 @@ on:
 
 env:
   PY_COLORS: 1
-  UV_VERSION: 0.5.28
+  UV_VERSION: 0.6.7
+  CARGO_TERM_COLOR: always
 
 jobs:
-  ci:
+  rust-ci:
+    runs-on: "${{ matrix.platform }}-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ["ubuntu", "macos", "windows"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+    - name: Run Clippy
+      run: cargo clippy --verbose
+    - name: Run Rust tests (parsing)
+      run: cargo test --verbose
+  python-ci:
     runs-on: "${{ matrix.platform }}-latest"
     strategy:
       fail-fast: false
@@ -32,8 +47,8 @@ jobs:
         version: ${{ env.UV_VERSION }}
     - name: Install project
       run: uv sync -p ${{ matrix.python }}
-    - name: Run tests (with coverage)
-      run: uv run pytest --cov src --cov-report term-missing
+    - name: Run Python tests (parsing + highlighting + styling)
+      run: uv run pytest
     - name: Lint code
       if: always()
       run: |
@@ -41,4 +56,4 @@ jobs:
         uv run ruff format --check
     - name: Run mypy
       if: always()
-      run: uv run mypy --strict src
+      run: uv run mypy --strict src tests
