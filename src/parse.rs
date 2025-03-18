@@ -37,7 +37,8 @@ impl CodeBlock {
 }
 
 static CODE_BLOCK_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?s)```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].*?)|(.*?))```").unwrap()
+    Regex::new(r"(?s)```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].*?)|(.*?))```")
+        .expect("guaranteed to be valid")
 });
 
 fn get_parser() -> tree_sitter::Parser {
@@ -45,13 +46,15 @@ fn get_parser() -> tree_sitter::Parser {
     let language = tree_sitter_zig::LANGUAGE;
     parser
         .set_language(&language.into())
-        .expect("error loading Zig parser");
+        .expect("tree-sitter-zig should work correctly");
     parser
 }
 
 pub fn tokenize_zig(src: &[u8]) -> Vec<Token> {
     let mut parser = get_parser();
-    let tree = parser.parse(src, None).unwrap();
+    let tree = parser
+        .parse(src, None)
+        .expect("should be Some, the parser was assigned a language");
     traverse(tree.root_node(), src)
 }
 
@@ -64,7 +67,7 @@ fn traverse(root: tree_sitter::Node, src: &[u8]) -> Vec<Token> {
             stack.extend(
                 (0..node.child_count())
                     .rev()
-                    .map(|i| node.child(i).unwrap()),
+                    .map(|i| node.child(i).expect("should be in-bounds")),
             );
             continue;
         }
@@ -89,10 +92,13 @@ pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
             if lang.is_some() {
                 CodeBlock::new(
                     lang.map(|m| match_to_utf8(m)),
-                    &match_to_utf8(body.unwrap()),
+                    &match_to_utf8(body.expect("should be present when lang is present")),
                 )
             } else {
-                CodeBlock::new(None, &match_to_utf8(no_lang_body.unwrap()))
+                CodeBlock::new(
+                    None,
+                    &match_to_utf8(no_lang_body.expect("should be present when lang is absent")),
+                )
             }
         })
         .collect()
@@ -116,17 +122,18 @@ mod tests {
             #[test]
             fn $name() {
                 let src_path = concat!("tests/sources/zig_inputs/", stringify!($name), ".zig");
-                let out_path = concat!("tests/sources/parsing_results/", stringify!($name), ".json");
-                let source = std::fs::read(src_path).unwrap();
+                let out_path =
+                    concat!("tests/sources/parsing_results/", stringify!($name), ".json");
+                let source = std::fs::read(src_path).expect("the file should be valid");
                 assert_eq!(tokenize_zig(&source), read_expected_tokens(out_path));
             }
-            
         };
     }
 
     fn read_expected_tokens(path: &str) -> Vec<Token> {
-        let content = std::fs::read_to_string(path).unwrap();
-        let t: Vec<OutputToken> = serde_json::from_str(&content).unwrap();
+        let content = std::fs::read_to_string(path).expect("error reading file");
+        let t: Vec<OutputToken> =
+            serde_json::from_str(&content).expect("the output json should be valid");
         t.into_iter()
             .map(|ot| Token {
                 kind: ot.kind.clone(),

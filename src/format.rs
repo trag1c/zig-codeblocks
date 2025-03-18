@@ -191,7 +191,10 @@ fn adjust_string_idents(body: &mut Vec<Frag>, token: &Token, theme: &Theme) {
             }
         }
     } else if check_end_index(body, 3, &at) {
-        body.insert(body.len() - 2, Frag::Sgr(*identifier_style.unwrap()));
+        body.insert(
+            body.len() - 2,
+            Frag::Sgr(*identifier_style.expect("guaranteed by prior logic")),
+        );
     }
 }
 
@@ -268,12 +271,13 @@ pub fn process_markdown(source: &[u8], theme: &Theme, only_code: bool) -> String
     }
     let mut new_source = source.to_vec();
     for cb in zig_codeblocks {
+        // TODO: don't use regexes here at all
         let pat = Regex::new(&format!("```zig\n{}(?:\r?\n)*```", regex::escape(&cb))).unwrap();
         let highlighted = format!("```ansi\n{}\n```", highlight_zig_code(cb.as_bytes(), theme));
         let target = highlighted.as_bytes().to_vec();
         let ranges = pat
             .captures_iter(&new_source)
-            .map(|c| c.get(0).unwrap().range())
+            .map(|c| c.get(0).expect("i=0 is guaranteed to be Some").range())
             .collect::<Vec<_>>();
         for r in ranges {
             new_source.splice(r, target.clone());
