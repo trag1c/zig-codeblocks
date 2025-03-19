@@ -125,7 +125,10 @@ mod tests {
                 let src_path = concat!("tests/sources/zig_inputs/", stringify!($name), ".zig");
                 let out_path =
                     concat!("tests/sources/parsing_results/", stringify!($name), ".json");
-                let source = std::fs::read(src_path).expect("the file should be valid");
+                let source = std::fs::read_to_string(src_path)
+                    .expect("the file should be valid")
+                    .replace("\r\n", "\n")
+                    .into_bytes();
                 let out_json = std::fs::read_to_string(out_path).expect("the file should be valid");
                 assert_eq!(tokenize_zig(&source), read_expected_tokens(&out_json));
             }
