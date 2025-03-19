@@ -3,12 +3,12 @@ use std::collections::HashMap;
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use regex::bytes::Regex;
 
 use crate::parse::{extract_codeblocks, tokenize_zig, Token};
 use crate::style::{Style, Theme, TokenType};
 
 pub const RESET: &str = "\x1b[0m";
+const CODEBLOCK_START: &[u8] = b"```zig\n";
 const KEYWORDS: [&str; 49] = [
     "addrspace",
     "align",
@@ -200,7 +200,7 @@ fn adjust_string_idents(body: &mut Vec<Frag>, token: &Token, theme: &Theme) {
 }
 
 fn process_zig_tokens(source: &[u8], tokens: Vec<Token>, theme: &Theme) -> String {
-    let mut body: Vec<Frag> = Vec::new();
+    let mut body: Vec<Frag> = Vec::with_capacity(tokens.len() * 2);
     let mut pointer = 0;
     let mut tokens = tokens.into_iter().peekable();
     let Some(mut token) = tokens.next() else {
@@ -263,25 +263,62 @@ pub fn highlight_zig_code(source: &[u8], theme: &Theme) -> String {
 pub fn process_markdown(source: &[u8], theme: &Theme, only_code: bool) -> String {
     let zig_codeblocks = extract_codeblocks(source)
         .into_iter()
-        .filter_map(|cb| (cb.lang == Some("zig".into())).then_some(cb.body));
+        .filter_map(|cb| (cb.lang == Some("zig".into())).then_some(cb.body.as_bytes().to_vec()));
     if only_code {
         return zig_codeblocks
-            .map(|cb| format!("```ansi\n{}\n```", highlight_zig_code(cb.as_bytes(), theme)))
+            .map(|cb| format!("```ansi\n{}\n```", highlight_zig_code(&cb, theme)))
             .collect::<Vec<_>>()
             .join("\n");
     }
+
+    // Deduplicating the codeblocks
+    let mut seen = std::collections::HashSet::new();
+    let zig_codeblocks = zig_codeblocks.filter(|item| seen.insert(item.clone()));
+
     let mut new_source = source.to_vec();
     for cb in zig_codeblocks {
-        // TODO: don't use regexes here at all
-        let pat = Regex::new(&format!("```zig\n{}(?:\r?\n)*```", regex::escape(&cb))).unwrap();
-        let highlighted = format!("```ansi\n{}\n```", highlight_zig_code(cb.as_bytes(), theme));
-        let target = highlighted.as_bytes().to_vec();
-        let ranges = pat
-            .captures_iter(&new_source)
-            .map(|c| c.get(0).expect("i=0 is guaranteed to be Some").range())
+        let needle = CODEBLOCK_START
+            .iter()
+            .copied()
+            .chain(cb.iter().copied())
             .collect::<Vec<_>>();
-        for r in ranges {
-            new_source.splice(r, target.clone());
+        let start_positions = new_source
+            .windows(needle.len())
+            .enumerate()
+            .filter_map(|(i, w)| if w == needle { Some(i) } else { None })
+            .collect::<Vec<_>>();
+
+        let mut ranges = Vec::new();
+        'outer: for start_pos in start_positions {
+            let mut end_pos = start_pos + needle.len();
+            loop {
+                // Reimplementing the "[\r\n]*```" regex
+                let Some(byte) = new_source.get(end_pos) else {
+                    continue 'outer;
+                };
+                if *byte == 10 || *byte == 13 {
+                    // \n or \r
+                    end_pos += 1;
+                    continue;
+                }
+                if let Some(potential_fence) = new_source.get(end_pos..end_pos + 3) {
+                    if potential_fence == b"```" {
+                        end_pos += 3;
+                        break;
+                    }
+                }
+                continue 'outer;
+            }
+            ranges.push((start_pos, end_pos));
+        }
+
+        let mut highlighted = highlight_zig_code(&cb, theme);
+        highlighted.insert_str(0, "```ansi\n");
+        highlighted.push_str("\n```");
+        let highlighted_bytes = highlighted.as_bytes();
+
+        for (s, e) in ranges.iter().rev() {
+            new_source.splice(s..e, highlighted_bytes.to_vec());
         }
     }
     String::from_utf8_lossy(&new_source).to_string()
