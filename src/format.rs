@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
 
 use pyo3::exceptions::PyValueError;
@@ -99,12 +100,12 @@ const TYPES: [&str; 26] = [
 ];
 
 #[derive(Clone, PartialEq, Eq)]
-enum Frag {
-    Text(String),
+enum Frag<'a> {
+    Text(Cow<'a, str>),
     Sgr(Style),
 }
 
-impl std::fmt::Display for Frag {
+impl std::fmt::Display for Frag<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
             Self::Text(t) => t.to_string(),
@@ -114,7 +115,7 @@ impl std::fmt::Display for Frag {
     }
 }
 
-fn last_applied_style(body: &[Frag]) -> Option<Frag> {
+fn last_applied_style<'a>(body: &[Frag<'a>]) -> Option<Frag<'a>> {
     body.iter()
         .rev()
         .find(|item| match item {
@@ -162,7 +163,7 @@ fn skip_to_token(source: &[u8], pointer: &mut usize, body: &mut Vec<Frag>, curre
         | (false, Some(Frag::Sgr(Style { .. }))) => body.push(Frag::Text(RESET.into())),
         _ => (),
     };
-    body.push(Frag::Text(filler));
+    body.push(Frag::Text(filler.into()));
     *pointer = current_token.byte_range.0;
 }
 
@@ -233,9 +234,9 @@ fn process_zig_tokens(source: &[u8], tokens: Vec<Token>, theme: &Theme) -> Strin
 
         adjust_string_idents(&mut body, &token, theme);
 
-        body.push(Frag::Text(
-            String::from_utf8_lossy(&token.value).to_string(),
-        ));
+        body.push(Frag::Text(Cow::Owned(
+            String::from_utf8_lossy(&token.value).into_owned(),
+        )));
         pointer = token.byte_range.1;
         if let Some(next_token) = tokens.next() {
             token = next_token;

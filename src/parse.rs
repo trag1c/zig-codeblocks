@@ -1,11 +1,12 @@
 use pyo3::prelude::*;
 use regex::bytes::Regex;
+use std::borrow::Cow;
 use std::sync::LazyLock;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct Token {
-    pub kind: String,
-    pub value: Vec<u8>,
+pub struct Token<'a> {
+    pub kind: Cow<'a, str>,
+    pub value: Cow<'a, [u8]>,
     pub byte_range: (usize, usize),
 }
 
@@ -58,7 +59,7 @@ pub fn tokenize_zig(src: &[u8]) -> Vec<Token> {
     traverse(tree.root_node(), src)
 }
 
-fn traverse(root: tree_sitter::Node, src: &[u8]) -> Vec<Token> {
+fn traverse<'a>(root: tree_sitter::Node, src: &'a [u8]) -> Vec<Token<'a>> {
     let mut tokens = Vec::new();
     let mut stack = vec![root];
 
@@ -72,8 +73,8 @@ fn traverse(root: tree_sitter::Node, src: &[u8]) -> Vec<Token> {
             continue;
         }
         tokens.push(Token {
-            kind: node.kind().to_string(),
-            value: src[node.start_byte()..node.end_byte()].to_vec(),
+            kind: Cow::Borrowed(node.kind()),
+            value: Cow::Borrowed(&src[node.start_byte()..node.end_byte()]),
             byte_range: (node.start_byte(), node.end_byte()),
         });
     }
@@ -106,7 +107,7 @@ pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
 
 #[cfg(test)]
 mod tests {
-    use super::{tokenize_zig, Token};
+    use super::{tokenize_zig, Cow, Token};
 
     use serde::{Deserialize, Serialize};
 
@@ -125,19 +126,19 @@ mod tests {
                 let out_path =
                     concat!("tests/sources/parsing_results/", stringify!($name), ".json");
                 let source = std::fs::read(src_path).expect("the file should be valid");
-                assert_eq!(tokenize_zig(&source), read_expected_tokens(out_path));
+                let out_json = std::fs::read_to_string(out_path).expect("the file should be valid");
+                assert_eq!(tokenize_zig(&source), read_expected_tokens(&out_json));
             }
         };
     }
 
-    fn read_expected_tokens(path: &str) -> Vec<Token> {
-        let content = std::fs::read_to_string(path).expect("error reading file");
+    fn read_expected_tokens(content: &str) -> Vec<Token> {
         let t: Vec<OutputToken> =
-            serde_json::from_str(&content).expect("the output json should be valid");
+            serde_json::from_str(content).expect("the output json should be valid");
         t.into_iter()
             .map(|ot| Token {
-                kind: ot.kind.clone(),
-                value: ot.value.unwrap_or(ot.kind).as_bytes().to_vec(),
+                value: Cow::Owned(ot.value.unwrap_or(ot.kind.clone()).as_bytes().to_vec()),
+                kind: Cow::Owned(ot.kind),
                 byte_range: ot.range,
             })
             .collect::<Vec<_>>()
