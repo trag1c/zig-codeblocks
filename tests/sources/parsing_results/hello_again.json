@@ -1,181 +1,147 @@
 [
     {
         "kind": "const",
-        "start": 0,
-        "end": 5
+        "range": [0, 5]
     },
     {
         "kind": "identifier",
         "value": "std",
-        "start": 6,
-        "end": 9
+        "range": [6, 9]
     },
     {
         "kind": "=",
-        "start": 10,
-        "end": 11
+        "range": [10, 11]
     },
     {
         "kind": "builtin_identifier",
         "value": "@import",
-        "start": 12,
-        "end": 19
+        "range": [12, 19]
     },
     {
         "kind": "(",
-        "start": 19,
-        "end": 20
+        "range": [19, 20]
     },
     {
         "kind": "\"",
-        "start": 20,
-        "end": 21
+        "range": [20, 21]
     },
     {
         "kind": "string_content",
         "value": "std",
-        "start": 21,
-        "end": 24
+        "range": [21, 24]
     },
     {
         "kind": "\"",
-        "start": 24,
-        "end": 25
+        "range": [24, 25]
     },
     {
         "kind": ")",
-        "start": 25,
-        "end": 26
+        "range": [25, 26]
     },
     {
         "kind": ";",
-        "start": 26,
-        "end": 27
+        "range": [26, 27]
     },
     {
         "kind": "pub",
-        "start": 29,
-        "end": 32
+        "range": [29, 32]
     },
     {
         "kind": "fn",
-        "start": 33,
-        "end": 35
+        "range": [33, 35]
     },
     {
         "kind": "identifier",
         "value": "main",
-        "start": 36,
-        "end": 40
+        "range": [36, 40]
     },
     {
         "kind": "(",
-        "start": 40,
-        "end": 41
+        "range": [40, 41]
     },
     {
         "kind": ")",
-        "start": 41,
-        "end": 42
+        "range": [41, 42]
     },
     {
         "kind": "void",
-        "start": 43,
-        "end": 47
+        "range": [43, 47]
     },
     {
         "kind": "{",
-        "start": 48,
-        "end": 49
+        "range": [48, 49]
     },
     {
         "kind": "identifier",
         "value": "std",
-        "start": 54,
-        "end": 57
+        "range": [54, 57]
     },
     {
         "kind": ".",
-        "start": 57,
-        "end": 58
+        "range": [57, 58]
     },
     {
         "kind": "identifier",
         "value": "debug",
-        "start": 58,
-        "end": 63
+        "range": [58, 63]
     },
     {
         "kind": ".",
-        "start": 63,
-        "end": 64
+        "range": [63, 64]
     },
     {
         "kind": "identifier",
         "value": "print",
-        "start": 64,
-        "end": 69
+        "range": [64, 69]
     },
     {
         "kind": "(",
-        "start": 69,
-        "end": 70
+        "range": [69, 70]
     },
     {
         "kind": "\"",
-        "start": 70,
-        "end": 71
+        "range": [70, 71]
     },
     {
         "kind": "string_content",
         "value": "Hello, world!",
-        "start": 71,
-        "end": 84
+        "range": [71, 84]
     },
     {
         "kind": "escape_sequence",
         "value": "\\n",
-        "start": 84,
-        "end": 86
+        "range": [84, 86]
     },
     {
         "kind": "\"",
-        "start": 86,
-        "end": 87
+        "range": [86, 87]
     },
     {
         "kind": ",",
-        "start": 87,
-        "end": 88
+        "range": [87, 88]
     },
     {
         "kind": ".",
-        "start": 89,
-        "end": 90
+        "range": [89, 90]
     },
     {
         "kind": "{",
-        "start": 90,
-        "end": 91
+        "range": [90, 91]
     },
     {
         "kind": "}",
-        "start": 91,
-        "end": 92
+        "range": [91, 92]
     },
     {
         "kind": ")",
-        "start": 92,
-        "end": 93
+        "range": [92, 93]
     },
     {
         "kind": ";",
-        "start": 93,
-        "end": 94
+        "range": [93, 94]
     },
     {
         "kind": "}",
-        "start": 95,
-        "end": 96
+        "range": [95, 96]
     }
 ]

@@ -1,9 +1,10 @@
-import json
+from __future__ import annotations
+
 from pathlib import Path
 
 import pytest
 
-from zig_codeblocks.parsing import CodeBlock, Token, extract_codeblocks, tokenize_zig
+from zig_codeblocks._core import CodeBlock, extract_codeblocks
 
 SOURCE_DIR = Path(__file__).parent / "sources"
 
@@ -21,7 +22,7 @@ SOURCE_DIR = Path(__file__).parent / "sources"
 def test_codeblock_spacing_scenarios(file_name: str) -> None:
     src = SOURCE_DIR / "spacing" / file_name
     for meth in (Path.read_text, Path.read_bytes):
-        assert list(extract_codeblocks(meth(src))) == [
+        assert extract_codeblocks(meth(src)) == [
             CodeBlock(lang="py", body="print(1)"),
             CodeBlock(lang="zig", body='const std = @import("std");'),
         ]
@@ -43,39 +44,6 @@ def test_codeblock_spacing_scenarios(file_name: str) -> None:
     ],
 )
 def test_codeblock_with_language(source: str, expected: tuple[str | None, str]) -> None:
-    codeblocks = list(extract_codeblocks(f"```{source}```"))
+    codeblocks = extract_codeblocks(f"```{source}```")
     assert len(codeblocks) == 1
     assert codeblocks[0] == CodeBlock(*expected)
-
-
-def read_expected_tokens(test_name: str) -> list[Token]:
-    return [
-        Token(
-            kind=t["kind"],
-            value=(t.get("value") or t["kind"]).encode(),
-            byte_range=range(t["start"], t["end"]),
-        )
-        for t in json.loads(
-            (SOURCE_DIR / "parsing_results" / f"{test_name}.json").read_bytes()
-        )
-    ]
-
-
-@pytest.mark.parametrize(
-    "test_name",
-    [
-        "assign_undefined",
-        "comments",
-        "emoji",
-        "global_assembly",
-        "hello_again",
-        "identifiers",
-    ],
-)
-def test_zig_parser(test_name: str) -> None:
-    source = (
-        (SOURCE_DIR / "zig_inputs" / f"{test_name}.zig")
-        .read_bytes()
-        .replace(b"\r\n", b"\n")
-    )
-    assert list(tokenize_zig(source)) == read_expected_tokens(test_name)

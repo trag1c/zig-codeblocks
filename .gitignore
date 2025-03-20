@@ -8,3 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Rust/PyO3-generated files
+target/
+*.so
