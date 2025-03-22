@@ -1,6 +1,26 @@
+import re
+
 import pytest
 
 from zig_codeblocks._core import Color, Style
+
+
+@pytest.mark.parametrize(
+    ("string", "expected"),
+    [
+        ("Gray", Color.Gray),
+        ("gray", Color.Gray),
+        ("GRAY", Color.Gray),
+        ("magenta", Color.Magenta),
+    ],
+)
+def test_color_from_string(string: str, expected: Color) -> None:
+    assert Color.from_string(string) == expected
+
+
+def test_color_from_string_fail() -> None:
+    with pytest.raises(ValueError, match=re.escape('Invalid color: "blurple"')):
+        Color.from_string("blurple")
 
 
 @pytest.mark.parametrize(

@@ -19,15 +19,15 @@ pub enum Color {
 impl Color {
     #[staticmethod]
     fn from_string(value: &str) -> PyResult<Self> {
-        match value {
-            "Gray" => Ok(Self::Gray),
-            "Red" => Ok(Self::Red),
-            "Green" => Ok(Self::Green),
-            "Orange" => Ok(Self::Orange),
-            "Blue" => Ok(Self::Blue),
-            "Magenta" => Ok(Self::Magenta),
-            "Cyan" => Ok(Self::Cyan),
-            "White" => Ok(Self::White),
+        match &value.to_lowercase()[..] {
+            "gray" => Ok(Self::Gray),
+            "red" => Ok(Self::Red),
+            "green" => Ok(Self::Green),
+            "orange" => Ok(Self::Orange),
+            "blue" => Ok(Self::Blue),
+            "magenta" => Ok(Self::Magenta),
+            "cyan" => Ok(Self::Cyan),
+            "white" => Ok(Self::White),
             _ => Err(PyValueError::new_err(format!("Invalid color: {value:?}"))),
         }
     }
