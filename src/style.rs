@@ -49,24 +49,6 @@ impl Color {
     }
 }
 
-impl TryFrom<u8> for Color {
-    type Error = u8;
-
-    fn try_from(code: u8) -> Result<Self, Self::Error> {
-        match code {
-            30 => Ok(Self::Gray),
-            31 => Ok(Self::Red),
-            32 => Ok(Self::Green),
-            33 => Ok(Self::Orange),
-            34 => Ok(Self::Blue),
-            35 => Ok(Self::Magenta),
-            36 => Ok(Self::Cyan),
-            37 => Ok(Self::White),
-            _ => Err(code),
-        }
-    }
-}
-
 #[pyclass(module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub struct Style {
