@@ -1,7 +1,6 @@
-use pyo3::exceptions::PyValueError;
-use pyo3::prelude::*;
-use std::collections::HashMap;
-use std::sync::LazyLock;
+use std::{collections::HashMap, sync::LazyLock};
+
+use pyo3::{exceptions::PyValueError, prelude::*};
 
 #[pyclass(eq, eq_int, module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]

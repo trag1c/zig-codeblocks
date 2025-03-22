@@ -1,11 +1,11 @@
-use std::borrow::Cow;
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
-use pyo3::exceptions::PyValueError;
-use pyo3::prelude::*;
+use pyo3::{exceptions::PyValueError, prelude::*};
 
-use crate::parse::{extract_codeblocks, tokenize_zig, Token};
-use crate::style::{Style, Theme, TokenType};
+use crate::{
+    parse::{extract_codeblocks, tokenize_zig, Token},
+    style::{Style, Theme, TokenType},
+};
 
 pub const RESET: &str = "\x1b[0m";
 const CODEBLOCK_START: &[u8] = b"```zig\n";

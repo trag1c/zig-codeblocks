@@ -1,7 +1,7 @@
+use std::{borrow::Cow, sync::LazyLock};
+
 use pyo3::prelude::*;
-use regex::bytes::Regex;
-use std::borrow::Cow;
-use std::sync::LazyLock;
+use regex::bytes::{Match, Regex};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Token<'a> {
@@ -81,7 +81,7 @@ fn traverse<'a>(root: tree_sitter::Node, src: &'a [u8]) -> Vec<Token<'a>> {
     tokens
 }
 
-fn match_to_utf8(r#match: regex::bytes::Match<'_>) -> String {
+fn match_to_utf8(r#match: Match<'_>) -> String {
     String::from_utf8_lossy(r#match.as_bytes()).to_string()
 }
 
@@ -107,11 +107,11 @@ pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
 
 #[cfg(test)]
 mod tests {
+    use std::fs::read_to_string;
+
     use super::{tokenize_zig, Cow, Token};
 
-    use serde::{Deserialize, Serialize};
-
-    #[derive(Serialize, Deserialize)]
+    #[derive(serde::Serialize, serde::Deserialize)]
     struct OutputToken {
         kind: String,
         value: Option<String>,
@@ -125,11 +125,11 @@ mod tests {
                 let src_path = concat!("tests/sources/zig_inputs/", stringify!($name), ".zig");
                 let out_path =
                     concat!("tests/sources/parsing_results/", stringify!($name), ".json");
-                let source = std::fs::read_to_string(src_path)
+                let source = read_to_string(src_path)
                     .expect("the file should be valid")
                     .replace("\r\n", "\n")
                     .into_bytes();
-                let out_json = std::fs::read_to_string(out_path).expect("the file should be valid");
+                let out_json = read_to_string(out_path).expect("the file should be valid");
                 assert_eq!(tokenize_zig(&source), read_expected_tokens(&out_json));
             }
         };
