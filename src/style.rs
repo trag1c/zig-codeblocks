@@ -48,6 +48,10 @@ impl Color {
     }
 }
 
+const fn python_bool_repr(value: bool) -> &'static str {
+    if value { "True" } else { "False" }
+}
+
 #[pyclass(module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub struct Style {
@@ -69,6 +73,15 @@ impl Style {
             bold,
             underline,
         }
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "Style({}, bold={}, underline={})",
+            self.color.__pyo3__repr__(),
+            python_bool_repr(self.bold),
+            python_bool_repr(self.underline)
+        )
     }
 
     fn __str__(&self) -> String {

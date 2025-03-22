@@ -41,3 +41,4 @@ def test_color_from_string_fail() -> None:
 def test_style(color: str, bold: bool, underline: bool, expected_sgr: str) -> None:
     style = Style(Color.from_string(color), bold=bold, underline=underline)
     assert str(style) == expected_sgr
+    assert eval(repr(style)) == style  # noqa: S307
