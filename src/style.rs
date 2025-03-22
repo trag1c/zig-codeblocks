@@ -3,7 +3,7 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Color {
     Gray,
@@ -67,7 +67,7 @@ impl TryFrom<u8> for Color {
     }
 }
 
-#[pyclass]
+#[pyclass(module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub struct Style {
     #[pyo3(get, set)]

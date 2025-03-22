@@ -10,7 +10,7 @@ pub struct Token<'a> {
     pub byte_range: (usize, usize),
 }
 
-#[pyclass(eq, get_all)]
+#[pyclass(eq, get_all, module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq)]
 pub struct CodeBlock {
     pub lang: Option<String>,
