@@ -72,9 +72,9 @@ from zig_codeblocks import DEFAULT_THEME, Color, Style, highlight_zig_code
 source = Path("examples/hello_world.zig").read_text()
 
 theme = DEFAULT_THEME.copy()
-theme.builtin_identifiers = Style(Color.Orange, underline=True)
-theme.strings = Style(Color.Cyan)
-theme.types = None
+theme["BuiltinIdentifier"] = Style(Color.Orange, underline=True)
+theme["String"] = Style(Color.Cyan)
+del theme["Type"]
 
 print(
     highlight_zig_code(source),
@@ -118,23 +118,24 @@ class CodeBlock:
     lang: str
     body: str
 ```
-A code block extracted from a Markdown source.
+A code block extracted from a Markdown source. Immutable.
 
 
 ### `Color`
 ```py
 class Color(Enum):
-    GRAY = "30"
-    RED = "31"
-    GREEN = "32"
-    ORANGE = "33"
-    BLUE = "34"
-    MAGENTA = "35"
-    CYAN = "36"
-    WHITE = "37"  # Black for light mode
+    Gray = "30"
+    Red = "31"
+    Green = "32"
+    Orange = "33"
+    Blue = "34"
+    Magenta = "35"
+    Cyan = "36"
+    White = "37"  # Black for light mode
 ```
 An enumeration of 3-bit ANSI colors.
 Some names were adjusted to match Discord's style.
+A color can be instantiated from a string too: `Color.from_string("Blue")`.
 
 
 ### `Style`
@@ -153,15 +154,15 @@ Produces an SGR sequence when converted to a string.
 ### `Theme`
 ```py
 class Theme(TypedDict, total=False):
-    builtin_identifiers: Style
-    calls: Style
-    comments: Style
-    identifiers: Style
-    keywords: Style
-    numeric: Style
-    strings: Style
-    primitive_values: Style
-    types: Style
+    BuiltinIdentifier: Style
+    Call: Style
+    Comment: Style
+    Identifier: Style
+    Keyword: Style
+    Numeric: Style
+    PrimitiveValue: Style
+    String: Style
+    Type: Style
 ```
 A theme dict for syntax highlighting Zig code.
 Each key is optional and can be provided a [`Style`](#style) to apply to the
@@ -171,13 +172,13 @@ Can be instantiated with a dict literal or with a `Theme` call:
 from zig_codeblocks import Color, Style, Theme
 
 theme_foo = Theme(
-    numeric=Style(Color.Blue),
-    strings=Style(Color.Green),
+    Numeric=Style(Color.Blue),
+    String=Style(Color.Green),
 )
 
 theme_bar: Theme = {
-    "numeric": Style(Color.Blue),
-    "strings": Style(Color.Green),
+    "Numeric": Style(Color.Blue),
+    "String": Style(Color.Green),
 }
 
 assert theme_foo == theme_bar
@@ -187,16 +188,16 @@ assert theme_foo == theme_bar
 ### `DEFAULT_THEME`
 The default theme used for highlighting, defined as follows:
 ```py
-DEFAULT_THEME = Theme(
-    builtin_identifiers=Style(Color.Blue, bold=True),
-    calls=Style(Color.Blue),
-    comments=Style(Color.Gray),
-    keywords=Style(Color.Magenta),
-    numeric=Style(Color.Cyan),
-    primitive_values=Style(Color.Cyan),
-    strings=Style(Color.Green),
-    types=Style(Color.Orange),
-)
+DEFAULT_THEME: Theme = {
+    "BuiltinIdentifier": Style(Color.Blue, bold=True),
+    "Call": Style(Color.Blue),
+    "Comment": Style(Color.Gray),
+    "Keyword": Style(Color.Magenta),
+    "Numeric": Style(Color.Cyan),
+    "PrimitiveValue": Style(Color.Cyan),
+    "String": Style(Color.Green),
+    "Type": Style(Color.Orange),
+}
 ```
 
 

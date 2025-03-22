@@ -36,8 +36,8 @@ class Theme(TypedDict, total=False):
     Identifier: Style
     Keyword: Style
     Numeric: Style
-    String: Style
     PrimitiveValue: Style
+    String: Style
     Type: Style
 
 def highlight_zig_code(source: str | bytes, theme: Theme = ...) -> str: ...
