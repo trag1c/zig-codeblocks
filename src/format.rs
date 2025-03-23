@@ -9,6 +9,7 @@ use crate::{
 
 pub const RESET: &str = "\x1b[0m";
 const CODEBLOCK_START: &[u8] = b"```zig\n";
+const CODEBLOCK_END: &[u8] = b"```";
 const KEYWORDS: [&str; 49] = [
     "addrspace",
     "align",
@@ -277,12 +278,11 @@ pub fn process_markdown(source: &[u8], theme: &Theme, only_code: bool) -> String
 
     let mut new_source = source.to_vec();
     for cb in zig_codeblocks {
-        let needle = CODEBLOCK_START
-            .iter()
-            .copied()
-            .chain(cb.iter().copied())
-            .chain(b"```".iter().copied())
-            .collect::<Vec<_>>();
+        let mut needle = Vec::with_capacity(CODEBLOCK_START.len() + cb.len() + CODEBLOCK_END.len());
+        needle.extend_from_slice(CODEBLOCK_START);
+        needle.extend_from_slice(&cb);
+        needle.extend_from_slice(CODEBLOCK_END);
+
         let start_positions = new_source
             .windows(needle.len())
             .enumerate()
