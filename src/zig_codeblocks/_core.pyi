@@ -28,7 +28,6 @@ class Style:
     def __init__(
         self, color: Color, *, bold: bool = False, underline: bool = False
     ) -> None: ...
-
     @staticmethod
     def from_string(value: str) -> Style: ...
 
