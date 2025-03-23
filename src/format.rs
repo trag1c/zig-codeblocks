@@ -1,4 +1,8 @@
-use std::{borrow::Cow, collections::HashMap};
+use std::{
+    borrow::Cow,
+    collections::{HashMap, HashSet},
+    hash::{DefaultHasher, Hash, Hasher},
+};
 
 use pyo3::{exceptions::PyValueError, prelude::*};
 
@@ -261,6 +265,12 @@ pub fn highlight_zig_code(source: &[u8], theme: &Theme) -> String {
     process_zig_tokens(source, tokenize_zig(source), theme)
 }
 
+fn get_body_hash(body: &[u8]) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    body.hash(&mut hasher);
+    hasher.finish()
+}
+
 pub fn process_markdown(source: &[u8], theme: &Theme, only_code: bool) -> String {
     let zig_codeblocks = extract_codeblocks(source)
         .into_iter()
@@ -273,8 +283,8 @@ pub fn process_markdown(source: &[u8], theme: &Theme, only_code: bool) -> String
     }
 
     // Deduplicating the codeblocks
-    let mut seen = std::collections::HashSet::new();
-    let zig_codeblocks = zig_codeblocks.filter(|item| seen.insert(item.clone()));
+    let mut seen = HashSet::new();
+    let zig_codeblocks = zig_codeblocks.filter(|item| seen.insert(get_body_hash(item)));
 
     let mut new_source = source.to_vec();
     for cb in zig_codeblocks {
