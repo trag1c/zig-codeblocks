@@ -46,7 +46,7 @@ jobs:
       with:
         version: ${{ env.UV_VERSION }}
     - name: Install project
-      run: uv sync -p ${{ matrix.python }}
+      run: uv sync -p ${{ matrix.python }} --extra cli
     - name: Run Python tests (parsing + highlighting + styling)
       run: uv run pytest
     - name: Lint code

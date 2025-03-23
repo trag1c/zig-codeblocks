@@ -18,6 +18,15 @@ You can also install it from source:
 ```sh
 pip install git+https://github.com/trag1c/zig-codeblocks.git
 ```
+---
+`zig-codeblocks` also exposes a CLI via a `cli` extra:
+```py
+pip install "zig-codeblocks[cli]"
+```
+If the CLI is all you need, you can run it with `uvx`:
+```sh
+uvx "zig-codeblocks[cli]" --help
+```
 
 
 ## API Reference

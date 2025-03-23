@@ -6,22 +6,23 @@ readme = "README.md"
 license = "MIT"
 authors = [{ name = "trag1c", email = "dev@jakubr.me" }]
 requires-python = ">=3.9"
-dependencies = [
-    "more-itertools~=10.6",
-]
+dependencies = []
 
 [project.urls]
 repository = "https://github.com/trag1c/zig-codeblocks"
+
+[project.scripts]
+zig-codeblocks = "zig_codeblocks.__main__:app"
+
+[project.optional-dependencies]
+cli = ["typer-slim>=0.15.2"]
 
 [build-system]
 requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [dependency-groups]
-dev = ["mypy>=1.14.1", "pytest>=8.3.4", "pytest-cov>=6.0.0", "ruff>=0.9.4"]
-
-[tool.coverage.report]
-exclude_also = ["if TYPE_CHECKING:"]
+dev = ["mypy>=1.14.1", "pytest>=8.3.4", "ruff>=0.9.4"]
 
 [tool.maturin]
 module-name = "zig_codeblocks._core"
@@ -31,16 +32,17 @@ python-source = "src"
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-    "COM",
-    "D",
-    "FIX",
-    "ANN401",
-    "ISC001",
-    "T201",
-    "TD003",
-    "PLR2004",
-    "S105",
+  "COM",
+  "D",
+  "FIX",
+  "ANN401",
+  "ISC001",
+  "T201",
+  "TD003",
+  "PLR2004",
+  "S105",
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["INP", "FBT", "PLC2701", "S101", "SLF001"]
+"__main__.py" = ["FA", "TCH", "FBT002", "UP00"]
