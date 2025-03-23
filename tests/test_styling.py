@@ -42,3 +42,31 @@ def test_style(color: str, bold: bool, underline: bool, expected_sgr: str) -> No
     style = Style(Color.from_string(color), bold=bold, underline=underline)
     assert str(style) == expected_sgr
     assert eval(repr(style)) == style  # noqa: S307
+
+
+@pytest.mark.parametrize(
+    ("string", "expected"),
+    [
+        ("red", Style(Color.Red)),
+        ("blue+bold", Style(Color.Blue, bold=True)),
+        ("oRange+BOLD", Style(Color.Orange, bold=True)),
+        ("green+underline", Style(Color.Green, underline=True)),
+        ("bold+cyan+underline", Style(Color.Cyan, bold=True, underline=True)),
+        ("bold+underline+magenta", Style(Color.Magenta, bold=True, underline=True)),
+    ],
+)
+def test_style_from_string(string: str, expected: Style) -> None:
+    assert Style.from_string(string) == expected
+
+
+@pytest.mark.parametrize(
+    ("string", "err_msg"),
+    [
+        ("underline+bold", "Missing color in input string"),
+        ("black+bold+underline", 'Invalid color "black"'),
+        ("red+cyan", "Multiple colors found: Red and Cyan"),
+    ],
+)
+def test_style_from_string_fail(string: str, err_msg: str) -> None:
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
+        Style.from_string(string)

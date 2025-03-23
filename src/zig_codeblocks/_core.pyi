@@ -29,6 +29,9 @@ class Style:
         self, color: Color, *, bold: bool = False, underline: bool = False
     ) -> None: ...
 
+    @staticmethod
+    def from_string(value: str) -> Style: ...
+
 class Theme(TypedDict, total=False):
     BuiltinIdentifier: Style
     Call: Style

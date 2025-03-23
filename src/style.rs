@@ -75,6 +75,40 @@ impl Style {
         }
     }
 
+    #[staticmethod]
+    fn from_string(value: &str) -> PyResult<Self> {
+        let mut color: Option<Color> = None;
+        let mut bold = false;
+        let mut underline = false;
+
+        for part in value.to_lowercase().split('+') {
+            match part {
+                "bold" => bold = true,
+                "underline" => underline = true,
+                c => {
+                    let Ok(valid_color) = Color::from_string(c) else {
+                        return Err(PyValueError::new_err(format!("Invalid color {c:?}")));
+                    };
+                    if let Some(applied) = color {
+                        return Err(PyValueError::new_err(format!(
+                            "Multiple colors found: {applied:?} and {valid_color:?}"
+                        )));
+                    }
+                    color = Some(valid_color);
+                }
+            }
+        }
+        if let Some(color) = color {
+            Ok(Self {
+                color,
+                bold,
+                underline,
+            })
+        } else {
+            Err(PyValueError::new_err("Missing color in input string"))
+        }
+    }
+
     fn __repr__(&self) -> String {
         format!(
             "Style({}, bold={}, underline={})",
