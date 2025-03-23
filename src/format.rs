@@ -281,44 +281,26 @@ pub fn process_markdown(source: &[u8], theme: &Theme, only_code: bool) -> String
             .iter()
             .copied()
             .chain(cb.iter().copied())
+            .chain(b"```".iter().copied())
             .collect::<Vec<_>>();
         let start_positions = new_source
             .windows(needle.len())
             .enumerate()
             .filter_map(|(i, w)| if w == needle { Some(i) } else { None })
+            .rev()
             .collect::<Vec<_>>();
-
-        let mut ranges = Vec::new();
-        'outer: for start_pos in start_positions {
-            let mut end_pos = start_pos + needle.len();
-            loop {
-                // Reimplementing the "[\r\n]*```" regex
-                let Some(byte) = new_source.get(end_pos) else {
-                    continue 'outer;
-                };
-                if *byte == 10 || *byte == 13 {
-                    // \n or \r
-                    end_pos += 1;
-                    continue;
-                }
-                if let Some(potential_fence) = new_source.get(end_pos..end_pos + 3) {
-                    if potential_fence == b"```" {
-                        end_pos += 3;
-                        break;
-                    }
-                }
-                continue 'outer;
-            }
-            ranges.push((start_pos, end_pos));
-        }
 
         let mut highlighted = highlight_zig_code(&cb, theme);
         highlighted.insert_str(0, "```ansi\n");
         highlighted.push_str("\n```");
         let highlighted_bytes = highlighted.as_bytes();
 
-        for (s, e) in ranges.iter().rev() {
-            new_source.splice(s..e, highlighted_bytes.to_vec());
+        let end_pos_offset = needle.len();
+        for start_pos in start_positions {
+            new_source.splice(
+                start_pos..start_pos + end_pos_offset,
+                highlighted_bytes.to_vec(),
+            );
         }
     }
     String::from_utf8_lossy(&new_source).to_string()
