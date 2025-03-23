@@ -8,6 +8,17 @@ highlighting to Zig code blocks in Markdown files through ANSI escape codes.
 Originally intended for patching the lack of syntax highlighting for Zig on
 Discord.
 
+- [Installation](#installation)
+- [API Reference](#api-reference)
+  - [`extract_codeblocks`](#extract_codeblocks)
+  - [`highlight_zig_code`](#highlight_zig_code)
+  - [`process_markdown`](#process_markdown)
+  - [`CodeBlock`](#codeblock)
+  - [`Color`](#color)
+  - [`Style`](#style)
+  - [`Theme`](#theme)
+  - [`DEFAULT_THEME`](#default_theme)
+- [License](#license)
 
 ## Installation
 `zig-codeblocks` is available on PyPI:
