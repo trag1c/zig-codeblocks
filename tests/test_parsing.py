@@ -22,22 +22,24 @@ SOURCE_DIR = Path(__file__).parent / "sources"
 def test_codeblock_spacing_scenarios(file_name: str) -> None:
     src = SOURCE_DIR / "spacing" / file_name
     for meth in (Path.read_text, Path.read_bytes):
-        assert extract_codeblocks(meth(src)) == [
-            CodeBlock(lang="py", body="print(1)"),
-            CodeBlock(lang="zig", body='const std = @import("std");'),
-        ]
+        code_blocks = extract_codeblocks(meth(src))
+        assert len(code_blocks) == 2
+        py_block, zig_block = code_blocks
+        assert (py_block.lang, zig_block.lang) == ("py", "zig")
+        assert py_block.body.strip("\r\n") == "print(1)"
+        assert zig_block.body.strip("\r\n") == 'const std = @import("std");'
 
 
 @pytest.mark.parametrize(
     ("source", "expected"),
     [
         ("rust", (None, "rust")),
-        ("rust\n", (None, "rust")),
+        ("rust\n", (None, "rust\n")),
         ("rust\nfn", ("rust", "fn")),
         ("zig\na", ("zig", "a")),
         ("zig\naa", ("zig", "aa")),
-        ("zig\na\n", ("zig", "a")),
-        ("rust\n\n\n\n\n\n", (None, "rust")),
+        ("zig\na\n", ("zig", "a\n")),
+        ("rust\n\n\n\n\n\n", (None, "rust\n\n\n\n\n\n")),
         ("ruśt\nfn", (None, "ruśt\nfn")),
         ("1+2\nfn", ("1+2", "fn")),
         ("1%2\nfn", (None, "1%2\nfn")),

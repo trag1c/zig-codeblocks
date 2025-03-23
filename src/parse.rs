@@ -23,7 +23,7 @@ impl CodeBlock {
     pub fn new(lang: Option<String>, body: &str) -> Self {
         Self {
             lang,
-            body: body.trim_matches(['\r', '\n']).into(),
+            body: body.to_owned(),
         }
     }
 
@@ -81,8 +81,8 @@ fn traverse<'a>(root: tree_sitter::Node, src: &'a [u8]) -> Vec<Token<'a>> {
     tokens
 }
 
-fn match_to_utf8(r#match: Match<'_>) -> String {
-    String::from_utf8_lossy(r#match.as_bytes()).to_string()
+fn match_to_utf8(r#match: Match<'_>) -> Cow<'_, str> {
+    String::from_utf8_lossy(r#match.as_bytes())
 }
 
 pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
@@ -92,7 +92,7 @@ pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
             let (lang, body, no_lang_body) = (m.get(1), m.get(2), m.get(3));
             if lang.is_some() {
                 CodeBlock::new(
-                    lang.map(|m| match_to_utf8(m)),
+                    lang.map(|m| match_to_utf8(m).to_string()),
                     &match_to_utf8(body.expect("should be present when lang is present")),
                 )
             } else {
