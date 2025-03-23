@@ -49,3 +49,16 @@ def test_codeblock_with_language(source: str, expected: tuple[str | None, str]) 
     codeblocks = extract_codeblocks(f"```{source}```")
     assert len(codeblocks) == 1
     assert codeblocks[0] == CodeBlock(*expected)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        '```zig\nconst std = @import("std");\n```',
+        "```py\nprint(1)\n```\n```woah```",
+        "```\n\n\nhi\n\n\n```",
+    ],
+)
+def test_codeblocks_are_reproducible(source: str) -> None:
+    codeblocks = extract_codeblocks(source)
+    assert "\n".join(map(str, codeblocks)) == source

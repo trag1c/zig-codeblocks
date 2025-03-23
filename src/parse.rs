@@ -35,6 +35,20 @@ impl CodeBlock {
         };
         format!("CodeBlock(lang={lang_repr}, body={:?})", self.body)
     }
+
+    fn __str__(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl std::fmt::Display for CodeBlock {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(lang) = &self.lang {
+            write!(f, "```{lang}\n{}```", self.body)
+        } else {
+            write!(f, "```{}```", self.body)
+        }
+    }
 }
 
 static CODE_BLOCK_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
