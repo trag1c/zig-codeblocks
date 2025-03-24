@@ -13,6 +13,8 @@ from zig_codeblocks._core import (
 
 
 class Theme(TypedDict, total=False):
+    """A theme for syntax highlighting Zig code."""
+
     BuiltinIdentifier: Style
     Call: Style
     Comment: Style

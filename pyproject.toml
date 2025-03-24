@@ -45,4 +45,5 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["INP", "FBT", "PLC2701", "S101", "SLF001"]
+"_core.pyi" = ["PYI021"]
 "__main__.py" = ["FA", "TCH", "FBT002", "UP00"]

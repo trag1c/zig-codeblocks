@@ -10,6 +10,7 @@ pub struct Token<'a> {
     pub byte_range: (usize, usize),
 }
 
+/// A code block extracted from a Markdown source.
 #[pyclass(eq, get_all, module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq)]
 pub struct CodeBlock {

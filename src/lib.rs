@@ -23,6 +23,7 @@ impl StrOrBytes {
     }
 }
 
+/// Return an ANSI syntax-highlighted version of the given Zig source code. Assumes UTF-8.
 #[pyfunction]
 #[pyo3(signature = (source, theme=style::DEFAULT_THEME_PREPROCESSED.clone()))]
 pub fn highlight_zig_code(
@@ -35,6 +36,8 @@ pub fn highlight_zig_code(
     ))
 }
 
+/// Return a Markdown source with Zig code blocks syntax-highlighted.
+/// If `only_code` is True, only processed Zig code blocks will be returned. Assumes UTF-8.
 #[pyfunction]
 #[pyo3(signature = (source, theme=style::DEFAULT_THEME_PREPROCESSED.clone(), *, only_code=false))]
 pub fn process_markdown(
@@ -49,6 +52,7 @@ pub fn process_markdown(
     ))
 }
 
+/// Return CodeBlocks from a Markdown source. Assumes UTF-8.
 #[pyfunction]
 pub fn extract_codeblocks(source: StrOrBytes) -> Vec<parse::CodeBlock> {
     parse::extract_codeblocks(source.resolve())
