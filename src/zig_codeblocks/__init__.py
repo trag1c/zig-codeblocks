@@ -42,6 +42,7 @@ __all__ = (
     "CodeBlock",
     "Color",
     "Style",
+    "Theme",
     "extract_codeblocks",
     "highlight_zig_code",
     "process_markdown",
