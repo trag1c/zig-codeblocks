@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0] - 2025-04-15
+
+### Added
+- A command-line interface
+- Python 3.9 support
+- `CodeBlock` objects now return the fenced Markdown code block form when
+  converted to string
+- `Style` objects can now be created from strings, e.g.
+  `Style.from_string("cyan+bold")` is the same as `Style(Color.Cyan, bold=True)`
+
+### Changed
+- Most of the parsing/highlighting logic was moved to Rust, leading to
+  significant speedups for both small (<300 lines) and large (>10k lines)
+  inputs:
+  - `highlight_zig_code` is 4–10x faster for small inputs and ~300x faster for
+    large inputs
+  - `process_markdown(only_code=False)` is 3–6x faster for small inputs and ~50x
+    faster for large inputs
+  - `process_markdown(only_code=True)` is ~4x faster for all inputs
+  - `extract_codeblocks` is ~10% faster for large inputs
+- `Color`:
+  - can no longer be instantiated with `Color["red"]`, use
+    `Color.from_string("red")` instead
+  - members now use PascalCase names, e.g. `Color.BLUE` is now `Color.Blue`
+- `extract_codeblocks`:
+  - no longer strips CR and LF characters
+  - now returns a list instead of an iterator
+- `Theme` keys are now PascalCase instead of snake_case
+
 ## [v0.2.3] - 2025-02-16
 
 ### Fixed
@@ -70,3 +99,4 @@ Initial release 🎉
 [v0.2.1]: https://github.com/trag1c/zig-codeblocks/compare/v0.2.0...v0.2.1
 [v0.2.2]: https://github.com/trag1c/zig-codeblocks/compare/v0.2.1...v0.2.2
 [v0.2.3]: https://github.com/trag1c/zig-codeblocks/compare/v0.2.2...v0.2.3
+[v0.3.0]: https://github.com/trag1c/zig-codeblocks/compare/v0.2.3...v0.3.0
