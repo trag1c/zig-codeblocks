@@ -1,7 +1,7 @@
 use std::{borrow::Cow, sync::LazyLock};
 
+use pcre2::bytes::{Match, Regex};
 use pyo3::prelude::*;
-use regex::bytes::{Match, Regex};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Token<'a> {
@@ -56,6 +56,9 @@ static CODE_BLOCK_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?s)```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].*?)|(.*?))```")
         .expect("guaranteed to be valid")
 });
+static INLINE_CODE_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?<!`)(``?)(?:[^`]|[^`].*?[^`])\1(?!`)").expect("guaranteed to be valid")
+});
 
 fn get_parser() -> tree_sitter::Parser {
     let mut parser = tree_sitter::Parser::new();
@@ -101,9 +104,26 @@ fn match_to_utf8(r#match: Match<'_>) -> Cow<'_, str> {
 }
 
 pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
-    CODE_BLOCK_PATTERN
-        .captures_iter(source)
+    let slices: Vec<_> = INLINE_CODE_PATTERN
+        .find_iter(source)
         .map(|m| {
+            let m = m.expect("there should be a match");
+            (m.start(), m.end())
+        })
+        .collect();
+    let source: Cow<'_, [u8]> = if slices.is_empty() {
+        Cow::Borrowed(source)
+    } else {
+        let mut source = source.to_vec();
+        for (a, b) in slices.iter().rev() {
+            source.drain(a..b);
+        }
+        Cow::Owned(source)
+    };
+    CODE_BLOCK_PATTERN
+        .captures_iter(&source)
+        .map(|m| {
+            let m = m.expect("capture should be ok");
             let (lang, body, no_lang_body) = (m.get(1), m.get(2), m.get(3));
             if lang.is_some() {
                 CodeBlock::new(

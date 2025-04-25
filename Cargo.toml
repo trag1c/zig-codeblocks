@@ -1,6 +1,6 @@
 [package]
 name = "zig_codeblocks"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 
 [lib]
@@ -9,10 +9,11 @@ name = "_core"
 crate-type = ["cdylib"]
 
 [dependencies]
+pcre2 = "0.2.9"
 # "extension-module" tells pyo3 we want to build an extension module (skips linking against libpython.so)
 # "abi3-py39" tells pyo3 (and maturin) to build using the stable ABI with minimum Python version 3.9
+# "generate-import-lib" helps with building on Windows
 pyo3 = { version = "0.24.0", features = ["extension-module", "abi3-py39", "generate-import-lib"] }
-regex = "1.11.1"
 tree-sitter = "0.25.3"
 tree-sitter-zig = "1.1.2"
 

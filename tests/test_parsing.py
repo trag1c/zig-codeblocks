@@ -17,6 +17,7 @@ SOURCE_DIR = Path(__file__).parent / "sources"
         ("squished.md"),
         ("no_gap.md"),
         ("squished_no_gap.md"),
+        ("triple_in_double_inline.md"),
     ],
 )
 def test_codeblock_spacing_scenarios(file_name: str) -> None:

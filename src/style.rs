@@ -51,7 +51,11 @@ impl Color {
 }
 
 const fn python_bool_repr(value: bool) -> &'static str {
-    if value { "True" } else { "False" }
+    if value {
+        "True"
+    } else {
+        "False"
+    }
 }
 
 /// A style for syntax highlighting.
