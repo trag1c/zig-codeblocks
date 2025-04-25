@@ -56,8 +56,9 @@ static CODE_BLOCK_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?s)```(?:([A-Za-z0-9\-_\+\.#]+)(?:\r?\n)+([^\r\n].*?)|(.*?))```")
         .expect("guaranteed to be valid")
 });
-static INLINE_CODE_PATTERN: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?<!`)(``?)[^`].*?[^`]\1(?!`)").expect("guaranteed to be valid"));
+static INLINE_CODE_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?<!`)(``?)(?:[^`]|[^`].*?[^`])\1(?!`)").expect("guaranteed to be valid")
+});
 
 fn get_parser() -> tree_sitter::Parser {
     let mut parser = tree_sitter::Parser::new();
