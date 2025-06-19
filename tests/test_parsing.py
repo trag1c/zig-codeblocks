@@ -58,6 +58,7 @@ def test_codeblock_with_language(source: str, expected: tuple[str | None, str]) 
         '```zig\nconst std = @import("std");\n```',
         "```py\nprint(1)\n```\n```woah```",
         "```\n\n\nhi\n\n\n```",
+        '```zig\nconst std = @import("std"); // this is `std`\n```',
     ],
 )
 def test_codeblocks_are_reproducible(source: str) -> None:

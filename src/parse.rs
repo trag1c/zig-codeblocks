@@ -115,8 +115,10 @@ pub fn extract_codeblocks(source: &[u8]) -> Vec<CodeBlock> {
         Cow::Borrowed(source)
     } else {
         let mut source = source.to_vec();
-        for (a, b) in slices.iter().rev() {
-            source.drain(a..b);
+        for &(a, b) in slices.iter().rev() {
+            if source[a..b].windows(3).any(|x| x == [b'`'; 3]) {
+                source.drain(a..b);
+            }
         }
         Cow::Owned(source)
     };
