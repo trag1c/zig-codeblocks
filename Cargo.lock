@@ -425,7 +425,7 @@ dependencies = [
 
 [[package]]
 name = "zig_codeblocks"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "pcre2",
  "pyo3",
