@@ -11,8 +11,8 @@ pub struct Token<'a> {
 }
 
 /// A code block extracted from a Markdown source.
-#[pyclass(eq, get_all, module = "zig_codeblocks._core")]
-#[derive(PartialEq, Eq)]
+#[pyclass(eq, get_all, frozen, hash, module = "zig_codeblocks._core")]
+#[derive(PartialEq, Eq, Hash)]
 pub struct CodeBlock {
     pub lang: Option<String>,
     pub body: String,

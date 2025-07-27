@@ -64,3 +64,19 @@ def test_codeblock_with_language(source: str, expected: tuple[str | None, str]) 
 def test_codeblocks_are_reproducible(source: str) -> None:
     codeblocks = extract_codeblocks(source)
     assert "\n".join(map(str, codeblocks)) == source
+
+
+@pytest.mark.parametrize(
+    ("a", "b", "eq"),
+    [
+        (
+            CodeBlock("zig", 'const std = @import("std");'),
+            CodeBlock("zig", 'const std = @import("std");'),
+            True,
+        ),
+        (CodeBlock(None, "foo"), CodeBlock("py", "foo"), False),
+        (CodeBlock("rs", "let _ = ..=..=0;"), CodeBlock("rs", "let _ = ..=..;"), False),
+    ],
+)
+def test_codeblocks_hash_eq_equivalence(a: CodeBlock, b: CodeBlock, eq: bool) -> None:
+    assert (a == b) is (hash(a) == hash(b)) is eq
