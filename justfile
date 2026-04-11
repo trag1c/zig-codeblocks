@@ -7,8 +7,8 @@ check:
     uv run ruff check
     uv run pyright src tests
     uv run pytest
-    uv run ruff format --check
-    uv run taplo fmt --check pyproject.toml
+    uv run ruff format --diff
+    uv run taplo fmt --check --diff pyproject.toml
 
 # Run ruff and taplo in fix mode
 fix:
