@@ -4,6 +4,7 @@ default:
 
 # Run ruff, pyright, pytest, cargo test, clippy, and taplo in check mode
 check:
+    uv sync --extra cli
     uv run ruff check
     uv run pyright src tests
     uv run pytest
