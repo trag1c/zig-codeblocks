@@ -69,7 +69,7 @@ fn get_parser() -> tree_sitter::Parser {
     parser
 }
 
-pub fn tokenize_zig(src: &[u8]) -> Vec<Token> {
+pub fn tokenize_zig(src: &[u8]) -> Vec<Token<'_>> {
     let mut parser = get_parser();
     let tree = parser
         .parse(src, None)
@@ -172,7 +172,7 @@ mod tests {
         };
     }
 
-    fn read_expected_tokens(content: &str) -> Vec<Token> {
+    fn read_expected_tokens(content: &str) -> Vec<Token<'_>> {
         let t: Vec<OutputToken> =
             serde_json::from_str(content).expect("the output json should be valid");
         t.into_iter()

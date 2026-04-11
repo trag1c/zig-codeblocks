@@ -56,10 +56,10 @@ jobs:
       run: uv sync --extra cli
     - name: taplo (TOML formatting)
       if: ${{ !cancelled() && steps.sync.conclusion == 'success' && matrix.platform == 'ubuntu' }}
-      run: uv run taplo fmt --check --diff pyproject.toml
+      run: uv run taplo fmt --check --diff pyproject.toml Cargo.toml rustfmt.toml
     - name: ruff format
       if: ${{ !cancelled() && steps.sync.conclusion == 'success' }}
-      run: uv run ruff format --diff --preview
+      run: uv run ruff format --diff
     - name: ruff lint
       if: ${{ !cancelled() && steps.sync.conclusion == 'success' }}
       run: uv run ruff check --output-format github

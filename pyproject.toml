@@ -29,6 +29,9 @@ module-name = "zig_codeblocks._core"
 python-packages = ["zig_codeblocks"]
 python-source = "src"
 
+[tool.ruff.format]
+preview = true
+
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
