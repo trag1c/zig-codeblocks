@@ -59,7 +59,7 @@ jobs:
       run: uv run taplo fmt --check --diff pyproject.toml
     - name: ruff format
       if: ${{ !cancelled() && steps.sync.conclusion == 'success' }}
-      run: uv run ruff format --diff --preview
+      run: uv run ruff format --diff
     - name: ruff lint
       if: ${{ !cancelled() && steps.sync.conclusion == 'success' }}
       run: uv run ruff check --output-format github
