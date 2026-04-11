@@ -1,6 +1,6 @@
 [private]
 default:
-   @just --list
+    @just --list
 
 # Run ruff, pytest, pyright, and taplo in check mode
 check:
