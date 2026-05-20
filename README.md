@@ -3,7 +3,7 @@
 
 # zig-codeblocks
 
-`zig-codeblocks` is a Rust-powered CPython 3.9+ library for adding syntax
+`zig-codeblocks` is a Rust-powered CPython 3.10+ library for adding syntax
 highlighting to Zig code blocks in Markdown files through ANSI escape codes.
 Originally intended for patching the lack of syntax highlighting for Zig on
 Discord.

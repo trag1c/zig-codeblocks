@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import Annotated, Optional, Union, cast
+from typing import Annotated, cast
 
 import zig_codeblocks as zc
 
@@ -29,13 +29,13 @@ THEME_OVERRIDE_OPTION = typer.Option(
 app = typer.Typer()
 
 
-def read_in(path: Optional[Path]) -> str:
+def read_in(path: Path | None) -> str:
     if path is None:
         return sys.stdin.read()
     return path.read_text()
 
 
-def parse_theme_config(config: str) -> dict[str, Union[str, zc.Style]]:
+def parse_theme_config(config: str) -> dict[str, str | zc.Style]:
     theme = {}
     for token_type, style in (item.split(":") for item in config.split(",")):
         if token_type not in zc.Theme.__optional_keys__:
@@ -45,7 +45,7 @@ def parse_theme_config(config: str) -> dict[str, Union[str, zc.Style]]:
     return theme
 
 
-def resolve_theme(theme: Optional[str], theme_overrides: Optional[str]) -> zc.Theme:
+def resolve_theme(theme: str | None, theme_overrides: str | None) -> zc.Theme:
     if theme is None:
         if theme_overrides is None:
             return zc.DEFAULT_THEME
@@ -65,11 +65,11 @@ def resolve_theme(theme: Optional[str], theme_overrides: Optional[str]) -> zc.Th
 @app.command(name="zig")
 def process_zig(
     path: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Argument(help=PATH_HELP_TEXT.format("Zig")),
     ] = None,
-    theme: Annotated[Optional[str], THEME_OPTION] = None,
-    theme_overrides: Annotated[Optional[str], THEME_OVERRIDE_OPTION] = None,
+    theme: Annotated[str | None, THEME_OPTION] = None,
+    theme_overrides: Annotated[str | None, THEME_OVERRIDE_OPTION] = None,
 ) -> None:
     print(zc.highlight_zig_code(read_in(path), resolve_theme(theme, theme_overrides)))
 
@@ -77,7 +77,7 @@ def process_zig(
 @app.command(name="markdown")
 def process_markdown(
     path: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Argument(help=PATH_HELP_TEXT.format("Markdown")),
     ] = None,
     only_code: Annotated[
@@ -88,8 +88,8 @@ def process_markdown(
             help="If true, only Zig codeblocks will be included in the output.",
         ),
     ] = False,
-    theme: Annotated[Optional[str], THEME_OPTION] = None,
-    theme_overrides: Annotated[Optional[str], THEME_OVERRIDE_OPTION] = None,
+    theme: Annotated[str | None, THEME_OPTION] = None,
+    theme_overrides: Annotated[str | None, THEME_OVERRIDE_OPTION] = None,
 ) -> None:
     theme_ = resolve_theme(theme, theme_overrides)
     print(zc.process_markdown(read_in(path), theme_, only_code=only_code))
@@ -98,11 +98,11 @@ def process_markdown(
 @app.command(name="codeblocks")
 def extract_codeblocks(
     path: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Argument(help=PATH_HELP_TEXT.format("Markdown")),
     ] = None,
     langs: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "-l",
             "--langs",

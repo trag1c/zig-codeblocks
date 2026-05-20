@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  UV_VERSION: 0.8.3
+  UV_VERSION: 0.11.15
   UV_LOCKED: 1
   UV_NO_SYNC: 1
   PY_COLORS: 1
@@ -21,9 +21,12 @@ jobs:
       matrix:
         platform: ["ubuntu", "macos", "windows"]
     steps:
-    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
     - name: Setup Rust
-      uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2  # stable
+      uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9  # v1.94.1
+      with:
+        toolchain: 1.94.1
+        components: clippy
     - name: cargo clippy
       run: cargo clippy --verbose
     - name: cargo test
@@ -34,21 +37,21 @@ jobs:
       fail-fast: false
       # https://blog.jaraco.com/efficient-use-of-ci-resources/
       matrix:
-        python: ["3.9", "3.13"]
+        python: ["3.10", "3.14"]
         platform: ["ubuntu", "macos", "windows"]
         include:
-        - python: "3.10"
-          platform: "ubuntu"
         - python: "3.11"
           platform: "ubuntu"
         - python: "3.12"
           platform: "ubuntu"
+        - python: "3.13"
+          platform: "ubuntu"
     env:
       UV_PYTHON: ${{ matrix.python }}
     steps:
-    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
     - name: Setup uv
-      uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1  # v6.5.0
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
       with:
         version: ${{ env.UV_VERSION }}
     - name: Environment

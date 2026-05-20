@@ -86,7 +86,7 @@ fn traverse<'a>(root: tree_sitter::Node, src: &'a [u8]) -> Vec<Token<'a>> {
             stack.extend(
                 (0..node.child_count())
                     .rev()
-                    .map(|i| node.child(i).expect("should be in-bounds")),
+                    .map(|i| node.child(i as u32).expect("should be in-bounds")),
             );
             continue;
         }

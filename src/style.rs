@@ -4,7 +4,7 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 
 /// An enumeration of 3-bit ANSI colors.
 /// Some names were adjusted to match Discord's style.
-#[pyclass(eq, eq_int, module = "zig_codeblocks._core")]
+#[pyclass(from_py_object, eq, eq_int, module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Color {
     Gray,
@@ -61,7 +61,7 @@ const fn python_bool_repr(value: bool) -> &'static str {
 /// A style for syntax highlighting.
 /// Takes a `Color` and can optionally be bold and/or underlined.
 /// Produces an SGR sequence when converted to a string.
-#[pyclass(eq, module = "zig_codeblocks._core")]
+#[pyclass(from_py_object, eq, module = "zig_codeblocks._core")]
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub struct Style {
     #[pyo3(get, set)]
